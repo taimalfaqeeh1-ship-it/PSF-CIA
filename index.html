@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Command Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0C0A;--ac:#D8B26E;--mix:#fff;--tx:#ECE8DF;
+  --s1:color-mix(in srgb,var(--bg) 93%,var(--mix));
+  --s2:color-mix(in srgb,var(--bg) 87%,var(--mix));
+  --ln:color-mix(in srgb,var(--bg) 84%,var(--mix));
+  --ln2:color-mix(in srgb,var(--bg) 70%,var(--mix));
+  --mu:color-mix(in srgb,var(--tx) 60%,var(--bg));
+  --acd:color-mix(in srgb,var(--ac) 14%,var(--bg));
+  --glow:color-mix(in srgb,var(--ac) 45%,transparent);
+  --card:color-mix(in srgb,var(--bg) 91%,var(--mix));
+  --onac:var(--bg);
+  --ok:#8FB86A;--wr:#E0A03C;--cr:#E5604A;
+  --fd:'Readex Pro','IBM Plex Sans Arabic',sans-serif;--fb:'IBM Plex Sans Arabic',system-ui,sans-serif;
+  --rail:252px;--r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(900px 520px at 88% -8%,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%),radial-gradient(700px 500px at 0% 105%,color-mix(in srgb,var(--ac) 9%,transparent),transparent 70%),var(--bg);background-attachment:fixed;color:var(--tx);font:400 1rem/1.8 var(--fb);min-height:100vh;display:flex}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+::selection{background:var(--ac);color:var(--onac)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+#bgLayer{position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center}
+/* ---- rail ---- */
+.rail{width:var(--rail);flex:none;position:sticky;top:12px;margin:12px;height:calc(100vh - 24px);border:1px solid var(--ln);border-radius:24px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:flex;flex-direction:column;padding:20px 12px 12px;z-index:30;box-shadow:0 20px 50px -30px #000}
+.brand{display:flex;align-items:center;gap:12px;padding:0 8px 18px;border-bottom:1px solid var(--ln)}
+.mark{width:44px;height:44px;flex:none;border-radius:14px;background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 55%,var(--bg)));color:var(--onac);display:grid;place-items:center;font:700 1.4rem var(--fd);box-shadow:0 8px 22px -8px var(--glow)}
+.brand b{font:700 1.05rem/1.25 var(--fd);display:block}
+.brand small{color:var(--mu);font-size:.76rem}
+.rail nav{flex:1;overflow-y:auto;padding:14px 0;scrollbar-width:thin;display:flex;flex-direction:column;gap:2px}
+.rail nav button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:12px;padding:9px 12px;cursor:pointer;color:var(--mu);text-align:start;font-size:.93rem;transition:color .15s,background .15s}
+.rail nav button svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rail nav button:hover{color:var(--tx);background:var(--s2)}
+.rail nav button.on{color:var(--ac);background:var(--acd);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 30%,transparent)}
+.rtools{border-top:1px solid var(--ln);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rtools .wide{grid-column:1/-1}
+.tb{border:1px solid var(--ln2);border-radius:12px;background:none;padding:8px 10px;cursor:pointer;text-align:center;text-decoration:none;font-size:.83rem;display:flex;align-items:center;justify-content:center;gap:6px;transition:border-color .15s,color .15s,background .15s}
+.tb:hover{border-color:var(--ac);color:var(--ac);background:var(--acd)}
+.tb.dc{background:#5865F2;border-color:#5865F2;color:#fff}.tb.dc:hover{color:#fff;filter:brightness(1.1);background:#5865F2}
+.live{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:.8rem;padding:0 8px 10px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pl 2s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}80%,100%{box-shadow:0 0 0 8px transparent}}
+.topbar{display:none}
+/* ---- main ---- */
+.stage{flex:1;min-width:0}
+main{max-width:1040px;margin:auto;padding:12px clamp(16px,3.5vw,40px) 70px}
+.view{display:none}.view.on{display:block;animation:in .45s ease}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.vh{padding:40px 0 22px;margin-bottom:26px;position:relative}
+.vh::after{content:'';position:absolute;inset-inline-start:0;bottom:0;width:64px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--ac),transparent)}
+.vh h2{font:700 clamp(1.8rem,4vw,2.6rem)/1.2 var(--fd)}
+.vh p{color:var(--mu);max-width:56ch;margin-top:6px}
+/* hero */
+.hero{position:relative;margin-top:14px;padding:clamp(30px,6vw,68px);border:1px solid var(--ln);border-radius:30px;overflow:hidden;background:linear-gradient(150deg,color-mix(in srgb,var(--ac) 10%,var(--card)),var(--card) 55%)}
+.hero::before{content:'';position:absolute;width:420px;height:420px;border-radius:50%;inset-inline-end:-120px;top:-160px;background:radial-gradient(circle,var(--glow),transparent 68%);filter:blur(10px);pointer-events:none}
+.hero::after{content:'';position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--tx) 14%,transparent) 1px,transparent 1.5px);background-size:22px 22px;mask-image:linear-gradient(160deg,transparent 30%,#000 100%);-webkit-mask-image:linear-gradient(160deg,transparent 30%,#000 100%);opacity:.5;pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero h1{font:700 clamp(2.6rem,9vw,6rem)/1.08 var(--fd);max-width:13ch;overflow-wrap:anywhere;background:linear-gradient(180deg,var(--tx) 35%,color-mix(in srgb,var(--tx) 40%,var(--ac)));-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.08em}
+.hero .tg{font-size:clamp(1.05rem,2.2vw,1.4rem);color:var(--mu);max-width:36ch;margin:18px 0 28px}
+.hero .go{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font-weight:600;padding:11px 24px;border-radius:14px;background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 70%,var(--bg)));color:var(--onac);text-decoration:none;box-shadow:0 10px 26px -12px var(--glow);transition:filter .15s,transform .15s,box-shadow .15s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 14px 30px -12px var(--glow)}.btn:active{transform:translateY(1px)}
+.btn.gh{background:color-mix(in srgb,var(--tx) 6%,transparent);color:var(--tx);box-shadow:inset 0 0 0 1px var(--ln2)}
+.btn.gh:hover{box-shadow:inset 0 0 0 1px var(--ac);color:var(--ac)}
+.btn.sm{padding:6px 14px;font-size:.85rem;border-radius:10px}
+.btn.dg{background:var(--cr);color:#fff;box-shadow:none}
+.clock{position:absolute;top:26px;inset-inline-end:30px;text-align:end;font:500 .9rem var(--fd);color:var(--mu);z-index:2}
+.clock b{display:block;font:700 2rem/1.1 var(--fd);color:var(--tx);font-variant-numeric:tabular-nums}
+.ledger{margin:12px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.ledger div{display:flex;flex-direction:column-reverse;gap:2px;padding:18px 20px;border:1px solid var(--ln);border-top:3px solid var(--ac);border-radius:16px;background:var(--card)}
+.ledger span{color:var(--mu);font-size:.88rem}
+.ledger i{display:none}
+.ledger b{font:700 2.3rem/1.15 var(--fd);color:var(--ac)}
+.mosaic{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:200px 200px;gap:12px;margin-top:16px}
+.mosaic div{background:var(--card);border:1px dashed var(--ln2);border-radius:var(--r);display:grid;place-items:center;color:var(--mu);font-size:.85rem;overflow:hidden}
+.mosaic div:has(img){border:1px solid var(--ln)}
+.mosaic div:first-child{grid-row:span 2}
+.mosaic div:nth-child(4){grid-column:2/4}
+.mosaic img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.mosaic div:hover img{transform:scale(1.06)}
+/* generic cards */
+.lead{font-size:clamp(1.1rem,2.3vw,1.45rem);line-height:1.9;max-width:52ch;margin-bottom:28px}
+.rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.rows>div{padding:24px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card);transition:transform .2s,border-color .2s}
+.rows>div:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--ac) 50%,var(--ln))}
+.rows h3{font:700 1.2rem var(--fd);color:var(--ac);margin-bottom:6px}
+.rows p{color:var(--mu)}
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.paths>div{padding:26px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card)}
+.paths h3{font:700 1.3rem var(--fd);margin-bottom:4px}
+.paths p{color:var(--mu);margin-bottom:16px}
+.ladder{list-style:none;position:relative;padding-inline-start:28px}
+.ladder::before{content:'';position:absolute;inset-block:12px;inset-inline-start:7px;width:2px;background:linear-gradient(var(--ac),var(--ln2))}
+.ladder li{position:relative;padding:5px 0}
+.ladder li::before{content:'';position:absolute;inset-inline-start:-27px;top:14px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--ac)}
+.ladder li:first-child::before{background:var(--ac);box-shadow:0 0 0 4px var(--acd)}
+.fto{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.fto>div{padding:26px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card);position:relative;overflow:hidden}
+.fto .n{font:700 5rem/1 var(--fd);color:var(--acd);position:absolute;top:-4px;inset-inline-end:16px}
+.fto h3{font:700 1.25rem var(--fd);margin-bottom:2px;position:relative}
+.fto small{color:var(--ac);font-weight:500;position:relative}
+.fto p{color:var(--mu);margin-top:12px;position:relative}
+.tool{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.search{flex:1 1 220px;background:var(--card);border:1px solid var(--ln2);border-radius:14px;padding:11px 16px;outline:0}
+.search:focus{border-color:var(--ac);box-shadow:0 0 0 4px var(--acd)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{background:none;border:1px solid var(--ln2);border-radius:99px;padding:5px 15px;cursor:pointer;color:var(--mu);font-size:.85rem;transition:all .15s}
+.chips button:hover{border-color:var(--ac);color:var(--ac)}
+.chips button.on{background:var(--ac);border-color:var(--ac);color:var(--onac)}
+/* rules */
+.acc{border:1px solid var(--ln);border-radius:var(--r);background:var(--card);margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.acc:hover,.acc.open{border-color:color-mix(in srgb,var(--c) 55%,var(--ln))}
+.acc>button{display:flex;align-items:center;gap:16px;width:100%;background:none;border:0;padding:14px 16px;cursor:pointer;text-align:start;font-weight:500;font-size:1.03rem}
+.acc .dg{flex:none;min-width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--c);color:var(--bg);font:700 1rem var(--fd)}
+.acc .ch{margin-inline-start:auto;transition:transform .25s;color:var(--mu)}
+.acc.open .ch{transform:rotate(180deg)}
+.acc .bd{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s}
+.acc.open .bd{grid-template-rows:1fr}
+.acc .bd>div{overflow:hidden;color:var(--mu);padding-inline:68px 16px}
+.acc.open .bd>div{padding-bottom:18px}
+/* sop */
+.sop{display:grid;grid-template-columns:230px 1fr;gap:20px}
+.side{display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card);align-self:start}
+.side button{background:none;border:0;border-radius:11px;padding:11px 14px;text-align:start;cursor:pointer;color:var(--mu);transition:all .15s}
+.side button:hover{color:var(--tx);background:var(--s2)}
+.side button.on{color:var(--ac);background:var(--acd)}
+.doc{padding:26px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card)}
+.doc h3{font:700 1.5rem var(--fd);margin-bottom:12px}
+.doc ul{padding-inline-start:22px}.doc li{padding:5px 0;color:var(--mu)}.doc li::marker{color:var(--ac)}
+/* tables */
+.tw{overflow:auto;border:1px solid var(--ln);border-radius:var(--r);max-height:540px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{position:sticky;top:0;background:var(--s2);text-align:start;padding:12px 18px;font-weight:600;color:var(--ac);border-bottom:1px solid var(--ln2)}
+td{padding:12px 18px;border-top:1px solid var(--ln)}
+tbody tr:first-child td{border-top:0}
+tbody tr:hover td{background:var(--s2)}
+.pill{padding:2px 12px;font-size:.78rem;border:1px solid currentColor;border-radius:99px;background:color-mix(in srgb,currentColor 10%,transparent)}
+.pill.on{color:var(--ok)}.pill.off{color:var(--cr)}.pill.lv{color:var(--wr)}
+.perm{display:inline-block;margin:3px 0;margin-inline:0 6px;padding:2px 12px;background:var(--acd);border-radius:99px;font-size:.82rem}
+/* ---- military roster ---- */
+.milnote{margin-bottom:14px;padding:16px 20px;border:1px solid var(--ln);border-inline-start:4px solid var(--ac);border-radius:0 var(--r) var(--r) 0;background:linear-gradient(100deg,var(--acd),color-mix(in srgb,var(--card) 88%,transparent) 70%);position:relative}
+.milnote h4{font:700 1.05rem/1.5 var(--fd);color:var(--ac);margin-bottom:4px}
+.milnote p{color:var(--mu);font-size:.92rem;line-height:1.9}
+.milnote .lg{display:flex;gap:8px 16px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--ln2);font-size:.8rem;color:var(--mu)}
+.milnote .lg span{display:inline-flex;align-items:center;gap:6px}
+.milnote .lg i{width:9px;height:9px;border-radius:2px;background:var(--ok);display:inline-block}
+.milnote .lg i.off{background:var(--cr)}.milnote .lg i.lv{background:var(--wr)}
+.tw.mil{border-color:var(--ln2);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 12%,transparent),0 18px 40px -32px #000}
+.tw.mil table{min-width:620px}
+.tw.mil th{background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 12%,var(--s2)),var(--s2));letter-spacing:.1em;font-size:.74rem}
+.tw.mil td{vertical-align:middle;padding:11px 16px}
+.tw.mil caption{caption-side:top;text-align:start;padding:12px 16px;font:600 .76rem var(--fd);letter-spacing:.16em;color:var(--ac);border-bottom:1px solid var(--ln2);background:color-mix(in srgb,var(--ac) 7%,transparent)}
+.mil-name{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.mil-name .av{width:32px;height:32px;font-size:.85rem}
+.mil-code{font:600 .84rem/1 var(--fd);letter-spacing:.08em;color:var(--ac);direction:ltr;white-space:nowrap}
+.tw.mil td .pill{border-radius:6px;font-size:.74rem;letter-spacing:.02em}
+.ins{display:inline-flex;align-items:center;justify-content:center;min-width:78px;padding:5px 10px;border:1px solid var(--ln2);border-radius:9px;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 10%,transparent),transparent);color:var(--ac);font:700 .95rem/1 var(--fd);letter-spacing:2px;white-space:nowrap}
+.ins small{font-size:.62rem;letter-spacing:0;color:var(--mu);margin-inline-start:6px}
+.milgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:12px}
+.mcard{border:1px solid var(--ln);border-radius:var(--r);background:var(--card);overflow:hidden;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--tx) 6%,transparent),0 18px 40px -32px #000;transition:transform .25s,border-color .25s}
+.mcard:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--ac) 55%,var(--ln))}
+.mcard .ph{aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden;border-bottom:1px solid var(--ln);background:radial-gradient(circle at 50% 35%,var(--acd),var(--s2))}
+.mcard .ph.adm{cursor:pointer}
+.mcard .ph img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.mcard:hover .ph img{transform:scale(1.05)}
+.mcard .ph .ins{min-width:auto;padding:10px 20px;border:0;background:none;font-size:2.1rem;border-radius:0}
+.mcard .bd{padding:14px 16px}
+.mcard .bd h4{font:700 1.1rem/1.4 var(--fd);color:var(--tx)}
+.mcard .bd .rk{color:var(--ac);font-size:.9rem;margin-top:2px}
+.mcard .bd .ml{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px dashed var(--ln2)}
+.simg{width:100%;border:1px solid var(--ln);border-radius:var(--r);margin-bottom:18px;display:none}
+.mg h3{font:700 1.25rem var(--fd);margin:26px 0 12px}
+.mi{display:flex;gap:16px;align-items:center;padding:10px;margin-bottom:10px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card)}
+.mi .th{width:120px;aspect-ratio:16/10;background:var(--s2);border-radius:12px;flex:none;display:grid;place-items:center;color:var(--ac);overflow:hidden}
+.mi .th img{width:100%;height:100%;object-fit:cover}
+.mi b{flex:1;font-weight:500}
+.cr{list-style:none;display:grid;gap:10px}
+.cr li{display:flex;gap:12px;padding:14px 18px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card);align-items:baseline}
+.cr i{flex:1;border-bottom:2px dotted var(--ln2)}.cr span{color:var(--mu)}
+/* forms */
+form{display:grid;gap:16px;max-width:560px}
+label{display:grid;gap:6px;color:var(--mu);font-size:.9rem}
+input,select,textarea{background:var(--card);border:1px solid var(--ln2);border-radius:12px;padding:11px 14px;outline:0;width:100%;color:var(--tx);transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 4px var(--acd)}
+textarea{min-height:100px;resize:vertical}
+input[type=color]{padding:3px;height:42px;cursor:pointer}
+input[type=checkbox]{width:auto;accent-color:var(--ac)}
+#out{white-space:pre-wrap;background:var(--card);border:1px solid var(--ln);border-inline-start:4px solid var(--ac);border-radius:14px;padding:16px;margin-top:18px;display:none;max-width:560px}
+/* modal / overlays */
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;place-items:center;z-index:80;padding:16px}
+.modal.on{display:grid}
+.mb{background:var(--s1);border:1px solid var(--ln2);border-radius:24px;max-width:460px;width:100%;padding:28px;box-shadow:0 30px 80px -30px #000,0 0 0 1px color-mix(in srgb,var(--ac) 18%,transparent);animation:in .3s ease}
+.mb h3{font:700 1.35rem var(--fd);margin-bottom:8px}
+.mb p{color:var(--mu);margin-bottom:14px}
+.mb .acts{display:flex;gap:8px;margin-top:16px}
+.err{color:var(--cr);font-size:.85rem;display:none;margin-top:8px}
+.sw{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
+.sw button{width:38px;height:38px;border:2px solid var(--ln2);border-radius:50%;cursor:pointer;background:linear-gradient(135deg,var(--a) 50%,var(--b) 50%);transition:transform .15s}
+.sw button:hover{border-color:var(--tx);transform:scale(1.1)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#boot,#gate{position:fixed;inset:0;background:radial-gradient(500px 360px at 50% 40%,color-mix(in srgb,var(--ac) 14%,transparent),transparent 70%),var(--bg);z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s,visibility .5s;padding:20px;text-align:center}
+#boot.off,#gate.off{opacity:0;visibility:hidden}
+#boot svg{width:84px;height:84px;filter:drop-shadow(0 0 14px var(--glow))}
+#boot path{fill:none;stroke:var(--ac);stroke-width:2.5;stroke-linejoin:round;stroke-dasharray:320;stroke-dashoffset:320;animation:dr 1.3s ease forwards}
+@keyframes dr{to{stroke-dashoffset:0}}
+#boot h1,#gate h1{font:700 1.6rem var(--fd)}
+.bar{width:180px;height:4px;border-radius:4px;overflow:hidden;background:var(--ln)}.bar i{display:block;height:100%;width:0;border-radius:4px;background:var(--ac);animation:ld 1.5s ease forwards}
+@keyframes ld{to{width:100%}}
+#gate{z-index:98;display:none}#gate.on{display:flex}
+#gate form{max-width:320px;width:100%}
+footer{border-top:1px solid var(--ln);padding:22px 4px 0;color:var(--mu);font-size:.85rem;margin-top:50px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+/* admin */
+.adm section{border:1px solid var(--ln);border-radius:var(--r);background:var(--card);padding:22px;margin-bottom:16px}
+.adm h3{font:700 1.1rem var(--fd);color:var(--ac);margin-bottom:12px}
+.adm .row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center;padding-bottom:8px;border-bottom:1px dashed var(--ln)}
+.adm .row input,.adm .row select,.adm .row textarea{flex:1 1 130px;padding:7px 10px;font-size:.88rem;width:auto;min-height:0;border-radius:10px}
+.adm .row textarea{flex:3 1 220px;height:44px;min-height:44px}
+.adm .x{background:var(--cr);color:#fff;border:0;border-radius:10px;width:32px;height:32px;cursor:pointer}
+.adm .hint{color:var(--mu);font-size:.85rem;margin-bottom:10px}
+.adm .langnote{background:var(--acd);border-inline-start:4px solid var(--ac);border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:.9rem}
+.adm .fbtn{position:relative;overflow:hidden}
+.adm .fbtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.saved{color:var(--ok);font-size:.85rem;opacity:0;transition:opacity .3s}.saved.on{opacity:1}
+.rt{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+@media(max-width:860px){
+  body{display:block}
+  .rail{position:fixed;inset-block:0;inset-inline-start:0;margin:0;top:0;height:100vh;border-radius:0;border-width:0;border-inline-end:1px solid var(--ln);background:var(--s1);transform:translateX(100%);transition:transform .3s;width:min(86vw,300px)}
+  [dir=ltr] .rail{transform:translateX(-100%)}
+  body.menu .rail{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.55)}
+  .topbar{display:flex;position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln);align-items:center;justify-content:space-between;padding:10px 16px}
+  .topbar b{font:700 1.05rem var(--fd)}
+  .topbar button{background:none;border:1px solid var(--ln2);border-radius:12px;width:40px;height:40px;cursor:pointer;font-size:1.2rem}
+  main{padding-top:0}
+  .clock{position:static;text-align:start;margin-bottom:18px}
+  .sop{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto}
+  .side button{white-space:nowrap}
+  .mosaic{grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,150px)}.mosaic div:first-child{grid-column:1/-1;grid-row:span 1}.mosaic div:nth-child(4){grid-column:span 1}
+  .acc .bd>div{padding-inline:16px}
+}
+.bk{display:grid;gap:14px;margin-top:14px}.bk:empty{display:none}
+.blk{padding:24px;border:1px solid var(--ln);border-radius:var(--r);background:var(--card)}
+.blk h3{font:700 1.25rem var(--fd);color:var(--ac);margin-bottom:10px}.blk p{color:var(--mu)}
+.vid iframe,.vid video{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;display:block;background:#000}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
+.news{display:flex;gap:18px;align-items:flex-start}.news>img{width:210px;aspect-ratio:4/3;object-fit:cover;border-radius:12px;flex:none}.news h3{color:var(--tx)}
+.nd{display:inline-block;font-size:.78rem;color:var(--ac);background:var(--acd);border-radius:99px;padding:1px 12px;margin-bottom:6px}
+.blk-ed{border:1px solid var(--ln2);border-radius:14px;padding:12px;margin-bottom:12px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}.thumbs span{position:relative}.thumbs img{width:60px;height:60px;object-fit:cover;border-radius:8px;display:block}
+.thumbs button{position:absolute;top:-6px;inset-inline-end:-6px;width:20px;height:20px;border:0;border-radius:50%;background:var(--cr);color:#fff;cursor:pointer;font-size:.7rem}
+@media(max-width:600px){.news{flex-direction:column}.news>img{width:100%}}
+.blk{position:relative}
+.be{position:absolute;top:12px;inset-inline-end:12px;width:34px;height:34px;border:1px solid var(--ac);border-radius:10px;background:var(--acd);color:var(--ac);cursor:pointer;z-index:2}
+.addbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:16px;border:2px dashed var(--ln2);border-radius:var(--r);color:var(--mu)}
+.expl{display:grid;gap:26px;padding:clamp(24px,4vw,44px);overflow:hidden;background:linear-gradient(150deg,color-mix(in srgb,var(--ac) 9%,var(--card)),var(--card) 62%)}
+.expl::before{content:'';position:absolute;inset-block:0;inset-inline-start:0;width:5px;background:linear-gradient(var(--ac),transparent)}
+.expl.has{grid-template-columns:1.25fr 1fr;align-items:center}
+.expl h3{font:700 clamp(1.5rem,3.2vw,2.2rem)/1.25 var(--fd);color:var(--tx);margin-bottom:12px}
+.expl p{font-size:1.05rem;line-height:2;margin-bottom:20px;color:color-mix(in srgb,var(--tx) 78%,var(--bg))}
+.expl p:last-child{margin-bottom:0}
+.expl>img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:18px;box-shadow:0 24px 50px -28px #000}
+@media(max-width:760px){.expl.has{grid-template-columns:1fr}}
+/* ===== polish layer ===== */
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(var(--ln) 1px,transparent 1px),linear-gradient(90deg,var(--ln) 1px,transparent 1px);background-size:64px 64px;opacity:.28;-webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0,#000,transparent);mask-image:radial-gradient(ellipse 80% 60% at 50% 0,#000,transparent)}
+main{max-width:1120px}
+.rail{box-shadow:0 30px 60px -36px #000,inset 0 1px 0 color-mix(in srgb,var(--tx) 6%,transparent)}
+.rail nav button.on::after{content:'';margin-inline-start:auto;width:6px;height:6px;border-radius:50%;background:var(--ac);box-shadow:0 0 10px var(--ac)}
+.rail nav button{font-weight:500}
+.vh{padding:46px 0 24px}
+.vh::before{content:'';display:block;width:34px;height:34px;margin-bottom:14px;border-radius:10px;background:var(--acd);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 40%,transparent),0 8px 20px -10px var(--glow)}
+.vh h2{font-weight:600;font-size:clamp(2rem,4.2vw,2.9rem)}
+.vh p{font-size:1.05rem}
+.vh::after{height:1px;width:100%;background:linear-gradient(90deg,var(--ac),var(--ln) 30%,transparent)}
+.hero{border-radius:28px;box-shadow:0 40px 80px -50px #000,inset 0 1px 0 color-mix(in srgb,var(--tx) 7%,transparent)}
+.hero h1{font-weight:600}
+.hero .tg{font-size:clamp(1.1rem,2.3vw,1.45rem)}
+.ledger{gap:1px;background:var(--ln);border:1px solid var(--ln);border-radius:22px;overflow:hidden;box-shadow:0 20px 50px -34px #000}
+.ledger div{border:0;border-radius:0;background:var(--card);position:relative;padding:20px 22px}
+.ledger div::before{content:'';position:absolute;top:0;inset-inline-start:22px;width:28px;height:3px;border-radius:0 0 4px 4px;background:var(--ac)}
+.ledger b{font-weight:600;font-size:2.4rem;margin-top:6px}
+.rows>div,.paths>div,.fto>div,.acc,.blk,.doc,.side,.mi,.cr li,.tw{box-shadow:inset 0 1px 0 color-mix(in srgb,var(--tx) 5%,transparent),0 18px 40px -32px #000}
+.rows>div,.paths>div,.fto>div,.acc,.blk,.mi,.cr li{animation:up .55s cubic-bezier(.2,.7,.2,1) both}
+.rows>div:nth-child(2),.paths>div:nth-child(2),.fto>div:nth-child(2){animation-delay:.07s}
+.rows>div:nth-child(3),.fto>div:nth-child(3){animation-delay:.14s}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.paths>div,.fto>div{transition:transform .25s,border-color .25s}
+.paths>div:hover,.fto>div:hover,.blk:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--ac) 45%,var(--ln))}
+.fto .n{font-weight:600;opacity:.9}
+th{font-size:.78rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--mu);background:var(--s2)}
+tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--tx) 2.5%,transparent)}
+tbody tr:hover td{background:var(--acd)}
+.acc>button{padding:16px 18px}
+.btn{padding:12px 26px;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 12px 28px -14px var(--glow)}
+.btn.gh{box-shadow:inset 0 0 0 1px var(--ln2)}
+.mark{box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 24px -10px var(--glow)}
+.mb{border-radius:26px}
+footer{margin-top:56px;padding-top:22px;position:relative}
+footer::before{content:'';position:absolute;top:-1px;inset-inline-start:0;width:80px;height:2px;background:var(--ac)}
+*{scrollbar-width:thin;scrollbar-color:var(--ln2) transparent}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--acd);color:var(--ac);font:700 1rem var(--fd);overflow:hidden;flex:none}
+.av img{width:100%;height:100%;object-fit:cover}
+.av.adm{cursor:pointer;box-shadow:0 0 0 2px var(--ac),0 0 14px var(--glow);transition:transform .15s}.av.adm:hover{transform:scale(1.1)}
+.av.big{width:72px;height:72px;font-size:1.8rem}
+.wn{color:var(--wr);font-size:.8rem;margin-inline-start:8px}
+.mem{max-width:520px;max-height:88vh;overflow:auto}
+.mh{display:flex;gap:14px;align-items:center;margin:12px 0 16px}.mh h3{margin:0}
+.mk{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--ln)}.mk span{color:var(--mu)}
+.mem h4{margin:16px 0 6px;color:var(--ac)}
+.wl{padding-inline-start:20px;color:var(--wr);margin-bottom:8px}.wl li{padding:3px 0}.mt{color:var(--mu)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.rail nav button.hid{opacity:.45;font-style:italic}
+.adm .nvrow{align-items:center}.adm .nvrow .nvi{flex:0 0 auto}
+.insimg{width:38px;height:38px;object-fit:contain;border-radius:8px;vertical-align:middle}
+#dlChip{position:fixed;top:12px;inset-inline-end:14px;z-index:60;display:none;align-items:center;gap:8px;padding:5px 14px 5px 6px;border:1px solid var(--ln2);border-radius:999px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(12px);font-size:.85rem}#dlChip img{width:26px;height:26px;border-radius:50%}
+#dlToast{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:9999;padding:10px 20px;border-radius:12px;background:var(--ac);color:var(--onac);font-weight:600;display:none}
+</style>
+</head>
+<body>
+
+<div id="bgLayer"></div>
+
+<div id="boot">
+  <svg viewBox="0 0 100 100"><path d="M50 6 L90 28 V72 L50 94 L10 72 V28 Z M30 62 V38 L50 58 L70 38 V62"/></svg>
+  <h1 id="bootName"></h1><div class="bar"><i></i></div>
+</div>
+
+<div id="gate">
+  <div class="mark" id="gMark" style="width:64px;height:64px;font-size:2rem">F</div>
+  <h1 id="gName"></h1>
+  <form id="gForm"><input id="gIn" type="password" autocomplete="off"><button class="btn" type="submit" id="gBtn"></button><div class="err" id="gErr"></div></form>
+</div>
+
+<aside class="rail" id="rail">
+  <div class="brand"><div class="mark" id="mark">F</div><div><b id="brandName"></b><small id="brandSub"></small></div></div>
+  <nav id="nav"></nav>
+  <div class="live"><i></i><span id="liveTxt"></span></div>
+  <div class="rtools">
+    <button class="tb" id="langBtn"></button>
+    <button class="tb" id="themeBtn"></button>
+    <a class="tb dc wide" id="dcBtn" href="#" target="_blank" rel="noopener">Discord</a>
+    <button class="tb wide" id="dlBtn"></button>
+    <button class="tb wide" id="memBtn"></button>
+    <button class="tb wide" id="lockBtn"></button>
+  </div>
+</aside>
+
+<div class="stage">
+  <div class="topbar"><button id="menuBtn" aria-label="menu">☰</button><b id="topName"></b><span style="width:40px"></span></div>
+  <main id="main">
+    <section class="view on" id="v-hub">
+      <div class="ledger" id="ledger"></div>
+      <div class="hero">
+        <div class="clock"><b id="clk">--:--</b><span id="clkSub"></span></div>
+        <h1 id="hubTitle"></h1>
+        <p class="tg" id="hubTag"></p>
+        <div class="go"><button class="btn" data-go="join" id="hubJoin"></button><a class="btn gh" id="hubDc" href="#" target="_blank" rel="noopener"></a></div>
+        </div>
+      <div class="mosaic" id="mosaic"></div>
+      <div class="bk" id="b-hub"></div>
+    </section>
+    <div id="views"></div>
+    <footer><span id="fName"></span><span id="fSrv"></span><span dir="ltr" style="opacity:.45">login v3</span></footer>
+  </main>
+</div>
+
+<div class="modal" id="agreeModal"><div class="mb">
+  <h3 id="agTitle"></h3><p id="agText"></p>
+  <label style="display:flex;flex-direction:row;gap:8px;align-items:center;color:var(--tx)"><input type="checkbox" id="agree"><span id="agLbl"></span></label>
+  <div class="acts"><button class="btn" id="agOk"></button><button class="btn gh" id="agNo"></button></div>
+</div></div>
+
+<div class="modal" id="codeModal"><div class="mb">
+  <h3 id="cdTitle"></h3><p id="cdText"></p>
+  <input id="codeIn" type="password" autocomplete="off">
+  <div class="err" id="codeErr"></div>
+  <div class="acts"><button class="btn" id="codeOk"></button><button class="btn gh" id="codeNo"></button></div>
+</div></div>
+
+<div class="modal" id="mcModal"><div class="mb"><h3 id="mcT"></h3><p id="mcP"></p><input id="mcIn" type="password" autocomplete="off"><div class="err" id="mcErr"></div><div class="acts"><button class="btn" id="mcOk"></button><button class="btn gh" id="mcNo"></button></div></div></div>
+
+<div class="modal" id="themeModal"><div class="mb">
+  <h3 id="thTitle"></h3><p id="thText"></p>
+  <div class="sw" id="sw"></div>
+  <div class="two"><label><span id="thAc"></span><input type="color" id="cAc"></label><label><span id="thBg"></span><input type="color" id="cBg"></label></div>
+  <div class="acts"><button class="btn" id="thOk"></button><button class="btn gh" id="thReset"></button></div>
+</div></div>
+
+<div class="modal" id="memModal"><div class="mb mem"><div id="memBody"></div><div class="acts"><button class="btn gh" id="memX"></button></div></div></div>
+
+<script>
+/* ======================= المحتوى الافتراضي / Default content ======================= */
+const B=(ar,en)=>({ar,en});
+const CONFIG={
+  adminHash:"240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", /* الكود الافتراضي: admin123 */
+  gate:{on:false,hash:"240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"},
+  theme:{accent:"#D8B26E",bg:"#0B0C0A"},
+  name:B("PSF","PSF"),short:"P",server:"CFW",discord:"https://discord.gg/AuKFpBFuc",
+  tagline:B("نحن الفرقة. ننفّذ بدقة وولاء.","We move as one. Precision and loyalty."),
+  about:B("فرقة رول بلاي منظّمة داخل سيرفر CFW. هدفنا لعب جماعي محترم، وتدريب مستمر، وسمعة نبنيها مهمة بعد مهمة.","A structured roleplay unit on the CFW server. We play as a team, train constantly, and build our reputation one operation at a time."),
+  stats:[{n:"24",l:B("عضو","Members")},{n:"5",l:B("رتب","Ranks")},{n:"3",l:B("سنوات خبرة","Years active")},{n:"24/7",l:B("نشاط","Activity")}],
+  values:[
+    {t:B("الانضباط","Discipline"),d:B("التزام كامل بالقوانين وسلسلة القيادة.","Full commitment to the rules and the chain of command.")},
+    {t:B("الولاء","Loyalty"),d:B("ما بنترك حدا من فرقتنا بالميدان.","No one from our unit is left behind in the field.")},
+    {t:B("التطوير","Growth"),d:B("تدريب مستمر لكل عضو جديد وقديم.","Ongoing training for every new and veteran member.")}],
+  paths:[
+    {t:B("المسار الميداني","Field path"),d:B("للأعضاء اللي بيحبوا العمل المباشر.","For members who prefer hands-on operations."),r:B("متدرب\nعضو\nعضو أول\nقائد فريق","Trainee\nMember\nSenior member\nTeam lead")},
+    {t:B("مسار القيادة","Command path"),d:B("للي بدهم يديروا ويخططوا.","For those who want to plan and lead."),r:B("ضابط\nنائب القائد\nالقائد","Officer\nDeputy commander\nCommander")}],
+  rules:[
+    {t:B("الاحترام العام","General respect"),deg:"0",d:B("احترام جميع الأعضاء واللاعبين. ممنوع الشتم والتنمر بكل أشكاله.","Respect every member and player. No insults or bullying of any kind.")},
+    {t:B("الالتزام بالرول بلاي","Roleplay standards"),deg:"1",d:B("الحفاظ على الشخصية وعدم كسر الرول أو استخدام معلومات من خارج اللعبة.","Stay in character. Do not break roleplay or use out-of-game information.")},
+    {t:B("سلسلة القيادة","Chain of command"),deg:"2",d:B("تنفيذ أوامر القادة حسب الرتبة. الاعتراض يكون بعد انتهاء الموقف.","Follow orders by rank. Objections are raised after the situation ends.")},
+    {t:B("النشاط","Activity"),deg:"3",d:B("حد أدنى للنشاط أسبوعياً. الغياب الطويل يلزمه إشعار مسبق.","A weekly minimum activity applies. Long absences need prior notice.")},
+    {t:B("تسريب المعلومات","Information leaks"),deg:"7",d:B("تسريب أي معلومة داخلية يؤدي إلى الطرد الفوري.","Leaking any internal information results in immediate removal.")}],
+  sop:[
+    {t:B("الانضمام","Joining"),d:B("قدّم عبر نموذج التقديم\nمقابلة قصيرة مع أحد القادة\nفترة تجربة 7 أيام","Apply through the application form\nShort interview with a commander\n7-day trial period")},
+    {t:B("الاستعداد للمهمة","Mission prep"),d:B("التأكد من العتاد\nاجتماع قبل المهمة\nتحديد القائد الميداني","Check your gear\nPre-mission briefing\nAssign the field lead")},
+    {t:B("التواصل","Communication"),d:B("استخدام قناة الصوت المخصصة\nاختصار الكلام\nتأكيد استلام كل أمر","Use the assigned voice channel\nKeep it short\nConfirm every order")}],
+  fto:[
+    {t:B("المراقبة","Observation"),dur:B("أسبوع 1","Week 1"),d:B("المتدرب يراقب مدرّبه ويتعلم الإجراءات بدون تدخل.","The trainee watches the trainer and learns procedures without intervening.")},
+    {t:B("المشاركة","Participation"),dur:B("أسبوع 2","Week 2"),d:B("يشارك بمهام بسيطة تحت إشراف مباشر.","Takes part in simple tasks under direct supervision.")},
+    {t:B("التقييم","Evaluation"),dur:B("أسبوع 3","Week 3"),d:B("يتولى المهمة كاملة والمدرب يقيّم الأداء.","Leads a full task while the trainer evaluates performance.")}],
+  access:[
+    {role:B("القيادة","Command"),perms:B("إدارة الأعضاء\nتعديل القوانين\nتعديل الجدول\nقبول الطلبات","Manage members\nEdit rules\nEdit schedule\nApprove applications")},
+    {role:B("الضباط","Officers"),perms:B("قيادة المهام\nتقييم المتدربين\nتعديل الجدول","Lead operations\nEvaluate trainees\nEdit schedule")},
+    {role:B("الأعضاء","Members"),perms:B("المشاركة بالمهام\nحضور التدريب","Join operations\nAttend training")},
+    {role:B("المتدربون","Trainees"),perms:B("المراقبة فقط","Observation only")}],
+  schedule:{img:"",note:B("الجدول العسكري يعرض الرتبة والكود التعريفي وحالة الجاهزية وشكل الرتبة لكل عنصر. الكود ثابت ويُستخدم في التقارير والقيود، والحالة تدل على الجاهزية الحالية. شكل الرتبة يُحدَّث تلقائياً عند تغيير الرتبة ويمكن تعديله يدوياً من لوحة التحكم.","The military schedule shows each member's rank, ID code, readiness status and rank insignia. The code is permanent and used in reports and records; the status shows current readiness. The insignia updates automatically with the rank and can be overridden from the control panel."),rows:[
+    {name:"Leader",rank:B("قائد","Commander"),code:"PSF-001",st:"on",ins:""},
+    {name:"Alpha",rank:B("نائب القائد","Deputy"),code:"PSF-002",st:"on",ins:""},
+    {name:"Bravo",rank:B("ضابط","Officer"),code:"PSF-003",st:"lv",ins:""},
+    {name:"Charlie",rank:B("عضو","Member"),code:"PSF-004",st:"on",ins:""},
+    {name:"Delta",rank:B("عضو","Member"),code:"PSF-005",st:"off",ins:""},
+    {name:"Echo",rank:B("متدرب","Trainee"),code:"PSF-006",st:"on",ins:""}]},
+  crewNote:B("كل عضو يظهر كبطاقة: الصورة في الأعلى، وتحتها الاسم والرتبة والكود التعريفي والحالة وتاريخ الانضمام. تقدر تضيف صورة أو تغيّرها من لوحة التحكم، وإذا ما في صورة بيظهر شعار الرتبة تلقائياً.","Each member appears as a card: the photo on top, with the name, rank, ID code, status and join date below. You can add or replace the photo from the control panel; if no photo is uploaded, the rank insignia is shown automatically."),
+  crew:[
+    {name:"Leader",rank:B("قائد","Commander"),st:"on",code:"PSF-001",ins:"",img:"",joined:"2023-01-15"},
+    {name:"Alpha",rank:B("نائب القائد","Deputy"),st:"on",code:"PSF-002",ins:"",img:"",joined:"2023-03-02"},
+    {name:"Bravo",rank:B("ضابط","Officer"),st:"lv",code:"PSF-003",ins:"",img:"",joined:"2024-05-10"},
+    {name:"Charlie",rank:B("عضو","Member"),st:"on",code:"PSF-004",ins:"",img:"",joined:"2024-08-21"},
+    {name:"Delta",rank:B("عضو","Member"),st:"off",code:"PSF-005",ins:"",img:"",joined:"2025-02-11"},
+    {name:"Echo",rank:B("متدرب","Trainee"),st:"on",code:"PSF-006",ins:"",img:"",joined:"2026-09-01"}],
+  media:[
+    {t:B("بث مباشر للفرقة","Unit live stream"),kind:"stream",url:"#",img:""},
+    {t:B("أرشيف المهمة الأولى","First operation archive"),kind:"archive",url:"#",img:""}],
+  credits:[{name:"Name",role:B("مطوّر الموقع","Web developer")},{name:"Name",role:B("المصمم","Designer")}],
+  gallery:["","","",""],blocks:[],pageVis:{},memHash:"",dcClientId:"1573778976747421756",
+  joinQs:[
+    {t:B("كم ساعة بتلعب بالأسبوع تقريباً؟","About how many hours do you play per week?"),k:"number",o:B("",""),req:"1"},
+    {t:B("شو أوقات تواجدك المعتادة؟","What are your usual online times?"),k:"text",o:B("",""),req:"1"},
+    {t:B("هل عندك مايك واضح؟","Do you have a working microphone?"),k:"choice",o:B("نعم\nلا","Yes\nNo"),req:"1"},
+    {t:B("أي مسار بتفضّل؟","Which path do you prefer?"),k:"choice",o:B("المسار الميداني\nمسار القيادة","Field path\nCommand path"),req:"1"},
+    {t:B("هل كنت بفرقة ثانية قبل؟ وليش تركتها؟","Were you in another unit before? Why did you leave?"),k:"long",o:B("",""),req:"1"},
+    {t:B("كيف سمعت عنا؟","How did you hear about us?"),k:"text",o:B("",""),req:"0"},
+    {t:B("لو شفت عضو بخالف اللوائح، شو بتعمل؟","If you saw a member breaking the rules, what would you do?"),k:"long",o:B("",""),req:"1"}],
+  bg:{img:"",dim:0.65}
+};
+/* ======================= الواجهة / UI strings ======================= */
+const UI={
+ar:{n_hub:"الرئيسية",n_about:"من نحن",n_paths:"المسارات",n_rules:"اللوائح",n_sop:"الإجراءات",n_fto:"التدريب",n_access:"الصلاحيات",n_schedule:"الجدول",n_crew:"الأعضاء",n_media:"الإعلام",n_credits:"الشكر",n_join:"التقديم",n_admin:"لوحة التحكم",
+d_about:"مين نحن وشو بيحكمنا.",d_paths:"كيف بتتقدم بالفرقة من أول يوم.",d_rules:"كل لائحة لها درجة، والدرجة الأعلى عقوبتها أشد.",d_sop:"الخطوات اللي منمشي عليها بكل مهمة.",d_fto:"برنامج تدريب المتدربين الجدد على ثلاث مراحل.",d_access:"مين بيقدر يعمل شو داخل الفرقة.",d_schedule:"مواعيد التدريب والمهمات.",d_crew:"قائمة الأعضاء وحالتهم الحالية.",d_media:"البثوث والأرشيف.",d_credits:"اللي اشتغلوا على هالبوابة.",d_join:"عبّي النموذج وانسخ الطلب لتذكرة الديسكورد.",
+live:"السيرفر شغال",lang:"English",theme:"الألوان",lock:"لوحة التحكم",unlock:"الخروج من اللوحة",join:"قدّم للانضمام",dc:"سيرفر الديسكورد",
+ops:"توقيت العمليات",search:"ابحث في اللوائح...",none:"ما في نتائج.",all:"الكل",on:"نشط",off:"غائب",lv:"إجازة",
+cName:"الاسم",cRank:"الرتبة",cCode:"الكود",cStatus:"الحالة",cIns:"الشعار",sInfoT:"شرح الجدول العسكري",crInfoT:"شرح بطاقات الأعضاء",sLeg:"دليل الحالة",sInsHint:"الشعار يُحدد تلقائياً من الرتبة",streams:"البثوث",archives:"الأرشيف",open:"فتح",noimg:"بدون صورة",
+f1:"الاسم داخل اللعبة",f2:"يوزر الديسكورد",f3:"العمر",f4:"الخبرة في الرول بلاي",f5:"ليش بدك تنضم؟",lv1:"مبتدئ",lv2:"متوسط",lv3:"محترف",build:"جهّز الطلب",copy:"نسخ الطلب",copied:"تم النسخ ✓",copyFail:"حدد النص وانسخه يدوياً",reqT:"طلب انضمام",
+agT:"اقرأ اللوائح أولاً",agP:"لازم توافق على اللوائح قبل التقديم.",agL:"قرأت اللوائح وأوافق عليها",agOk:"أوافق وأتابع",agNo:"رجوع",
+cdT:"لوحة التحكم",cdP:"أدخل كود الدخول.",cdOk:"دخول",cdNo:"إلغاء",cdErr:"الكود غلط. جرّب مرة ثانية.",
+gT:"بوابة مغلقة",gOk:"دخول",gPh:"كود الدخول",
+thT:"ألوان الموقع",thP:"اختر لوناً جاهزاً أو حدد ألوانك. بتنحفظ على جهازك.",thAc:"لون التمييز",thBg:"لون الخلفية",thOk:"تم",thReset:"الافتراضي",
+saved:"تم الحفظ ✓",
+a_lang:"أنت تعدّل النسخة العربية. بدّل اللغة من الشريط الجانبي لتعدّل الإنجليزية.",
+a_gen:"النصوص العامة",a_name:"اسم الفرقة",a_short:"حرف الشعار",a_server:"اسم السيرفر",a_dc:"رابط الديسكورد",a_tag:"الجملة الرئيسية",a_about:"نبذة",
+a_stats:"الإحصائيات",a_values:"القيم",a_paths:"المسارات",a_rules:"اللوائح",a_ruleH:"الدرجة من 0 إلى 7: اللون بيتغير تلقائياً.",a_sop:"الإجراءات",a_sopH:"كل سطر نقطة.",a_fto:"مراحل التدريب",a_access:"الصلاحيات",a_sch:"الجدول",a_schH:"عدّل صفوف الجدول: الاسم، الرتبة، الكود، الحالة وشكل الرتبة. الصور تظهر في صفحة الأعضاء.",a_crew:"الأعضاء",a_crewNote:"شرح بطاقات الأعضاء",a_schNote:"شرح الجدول العسكري",a_media:"الإعلام",a_cred:"الشكر",
+a_bg:"الخلفية",a_blocks:"الخانات المخصصة (شرح، فيديو، صور، جدول، أخبار)",a_blocksH:"أضف أي خانة واختر بأي صفحة بتظهر. الجدول: كل سطر صف وافصل الأعمدة بـ | (السطر الأول عناوين). الفيديو: رابط يوتيوب أو فيميو أو ملف mp4.",bt_text:"شرح",bt_video:"فيديو",bt_images:"صور",bt_table:"جدول",bt_news:"خبر",p_date:"التاريخ",p_body:"النص",p_tbl:"الجدول (كل سطر صف، الأعمدة بـ |)",a_up:"رفع صور",v_all:"للجميع",v_mem:"للأعضاء فقط",m_in:"دخول الأعضاء",m_out:"خروج الأعضاء",m_t:"دخول الأعضاء",m_p:"أدخل كود الأعضاء.",v_code:"كود الأعضاء (4 خانات أو أكثر)",a_vis:"الظهور: للزوار أو للأعضاء",a_visH:"اختر لكل صفحة، ولكل خانة مخصصة، إذا بتظهر للجميع أو للأعضاء بس. الأعضاء بيدخلوا بكود بتحدده هون. هاي إخفاء بالواجهة وليست حماية قوية.",p_joined:"تاريخ الانضمام",p_did:"ID الديسكورد",p_warns:"التحذيرات (كل سطر تحذير)",p_notes:"ملاحظات الإدارة",m_warns:"التحذيرات",m_close:"إغلاق",m_adm:"للإدارة فقط",p_vid:"فيديو داخل الشرح (اختياري): رابط يوتيوب/فيميو أو videos/intro.mp4",p_vurl:"رابط يوتيوب/فيميو، أو اسم ملف مثل videos/intro.mp4",p_kick:"عنوان صغير فوق العنوان (اختياري)",p_btn:"نص الزر (اختياري)، والرابط تحته",a_bgUp:"رفع خلفية",a_bgRm:"إزالة",a_dim:"التعتيم",a_gal:"صور الرئيسية",a_theme:"اللون الافتراضي",a_themeH:"هاد اللون اللي بيشوفه الزوار أول مرة.",
+a_sec:"الأمان",a_newCode:"كود لوحة التحكم الجديد",a_setCode:"تغيير الكود",a_gateOn:"قفل الموقع كله بكود دخول",a_gateCode:"كود دخول الموقع",a_gateSet:"حفظ كود الموقع",a_codeShort:"الكود لازم 4 خانات أو أكثر",a_codeDone:"تم تغيير الكود",
+a_secH:"الأكواد محفوظة على متصفحك. بيّنت للآخرين فقط بعد التصدير. هاي حماية بسيطة وليست حماية قوية.",
+a_ex:"التصدير والاستيراد",a_exH:"التعديلات بتنحفظ على متصفحك. لتظهر للجميع انسخ الإعدادات وابعتها لي.",a_exCopy:"تصدير ونسخ",a_imp:"استيراد",a_rst:"إعادة للافتراضي",a_rstQ:"إعادة كل شي للافتراضي؟",a_bad:"النص غير صالح",a_add:"+ إضافة",a_img:"صورة",a_imgBig:"الصورة كبيرة والتخزين امتلأ. جرّب صورة أصغر.",
+p_num:"الرقم",p_lbl:"الوصف",p_t:"العنوان",p_d:"الوصف",p_ranks:"الرتب (كل سطر رتبة)",p_deg:"الدرجة",p_txt:"النص",p_pts:"النقاط",p_dur:"المدة",p_role:"الدور",p_perms:"الصلاحيات (كل سطر)",p_day:"اليوم",p_time:"الوقت",p_act:"النشاط",p_note:"ملاحظات",p_nm:"الاسم",p_rank:"الرتبة",p_code:"الكود",p_ins:"شعار الرتبة (اختياري)",p_st:"الحالة",p_kind:"النوع",p_url:"الرابط",p_stream:"بث",p_arch:"أرشيف"},
+en:{n_hub:"Hub",n_about:"About",n_paths:"Paths",n_rules:"Regulations",n_sop:"SOP",n_fto:"Training",n_access:"Access",n_schedule:"Schedule",n_crew:"Crew",n_media:"Media",n_credits:"Credits",n_join:"Apply",n_admin:"Control panel",
+d_about:"Who we are and what governs us.",d_paths:"How you progress in the unit from day one.",d_rules:"Each rule carries a degree. The higher the degree, the heavier the penalty.",d_sop:"The steps we follow on every operation.",d_fto:"A three-phase program for new trainees.",d_access:"Who can do what inside the unit.",d_schedule:"Training and operation times.",d_crew:"Members and their current status.",d_media:"Streams and archives.",d_credits:"The people behind this portal.",d_join:"Fill in the form and paste the request into a Discord ticket.",
+live:"Server online",lang:"العربية",theme:"Colors",lock:"Control panel",unlock:"Leave panel",join:"Apply to join",dc:"Discord server",
+ops:"Operations time",search:"Search regulations...",none:"No results.",all:"All",on:"Active",off:"Absent",lv:"On leave",
+cName:"Name",cRank:"Rank",cCode:"Code",cStatus:"Status",cIns:"Insignia",sInfoT:"Military schedule guide",crInfoT:"Member cards guide",sLeg:"Status legend",sInsHint:"Insignia is derived from the rank",streams:"Streams",archives:"Archives",open:"Open",noimg:"No image",
+f1:"In-game name",f2:"Discord username",f3:"Age",f4:"Roleplay experience",f5:"Why do you want to join?",lv1:"Beginner",lv2:"Intermediate",lv3:"Experienced",build:"Build request",copy:"Copy request",copied:"Copied ✓",copyFail:"Select the text and copy it manually",reqT:"Join application",
+agT:"Read the regulations first",agP:"You must agree to the regulations before applying.",agL:"I have read and agree to the regulations",agOk:"Agree and continue",agNo:"Go back",
+cdT:"Control panel",cdP:"Enter the access code.",cdOk:"Enter",cdNo:"Cancel",cdErr:"Wrong code. Try again.",
+gT:"Restricted portal",gOk:"Enter",gPh:"Access code",
+thT:"Site colors",thP:"Pick a preset or set your own colors. Saved on your device.",thAc:"Accent color",thBg:"Background color",thOk:"Done",thReset:"Default",
+saved:"Saved ✓",
+a_lang:"You are editing the English version. Switch language from the sidebar to edit Arabic.",
+a_gen:"General text",a_name:"Unit name",a_short:"Logo letter",a_server:"Server name",a_dc:"Discord link",a_tag:"Tagline",a_about:"About text",
+a_stats:"Statistics",a_values:"Values",a_paths:"Paths",a_rules:"Regulations",a_ruleH:"Degree 0 to 7. The color changes automatically.",a_sop:"SOP",a_sopH:"One bullet per line.",a_fto:"Training phases",a_access:"Access roles",a_sch:"Schedule",a_schH:"Edit the schedule rows: name, rank, code, status and rank insignia. Photos are shown on the Crew page.",a_crew:"Crew",a_crewNote:"Member cards explanation",a_schNote:"Roster explanation",a_media:"Media",a_cred:"Credits",
+a_bg:"Background",a_blocks:"Custom blocks (text, video, images, table, news)",a_blocksH:"Add any block and pick the page it appears on. Table: one row per line, separate columns with | (first line is the header). Video: a YouTube or Vimeo link, or an mp4 file.",bt_text:"Text",bt_video:"Video",bt_images:"Images",bt_table:"Table",bt_news:"News",p_date:"Date",p_body:"Text",p_tbl:"Table (one row per line, columns with |)",a_up:"Upload images",v_all:"Everyone",v_mem:"Members only",m_in:"Member login",m_out:"Member logout",m_t:"Member login",m_p:"Enter the member code.",v_code:"Member code (4+ characters)",a_vis:"Visibility: visitors or members",a_visH:"For each page, and each custom block, choose whether everyone sees it or members only. Members enter with a code you set here. This hides things in the interface; it is not strong security.",p_joined:"Join date",p_did:"Discord ID",p_warns:"Warnings (one per line)",p_notes:"Staff notes",m_warns:"Warnings",m_close:"Close",m_adm:"Staff only",p_vid:"Video inside the text (optional): YouTube/Vimeo link or videos/intro.mp4",p_vurl:"YouTube/Vimeo link, or a file path like videos/intro.mp4",p_kick:"Small label above the title (optional)",p_btn:"Button text (optional), link below",a_bgUp:"Upload background",a_bgRm:"Remove",a_dim:"Darkness",a_gal:"Hub images",a_theme:"Default colors",a_themeH:"The colors first-time visitors see.",
+a_sec:"Security",a_newCode:"New control panel code",a_setCode:"Change code",a_gateOn:"Lock the whole site with an access code",a_gateCode:"Site access code",a_gateSet:"Save site code",a_codeShort:"The code needs at least 4 characters",a_codeDone:"Code changed",
+a_secH:"Codes are stored in your browser and reach others only after you export. This is basic protection, not strong security.",
+a_ex:"Export and import",a_exH:"Edits are saved in your browser. To show them to everyone, copy the settings and send them to me.",a_exCopy:"Export and copy",a_imp:"Import",a_rst:"Reset to default",a_rstQ:"Reset everything to default?",a_bad:"Invalid text",a_add:"+ Add",a_img:"Image",a_imgBig:"The image is too large and storage is full. Try a smaller one.",
+p_num:"Number",p_lbl:"Label",p_t:"Title",p_d:"Description",p_ranks:"Ranks (one per line)",p_deg:"Degree",p_txt:"Text",p_pts:"Points",p_dur:"Duration",p_role:"Role",p_perms:"Permissions (one per line)",p_day:"Day",p_time:"Time",p_act:"Activity",p_note:"Notes",p_nm:"Name",p_rank:"Rank",p_code:"Code",p_ins:"Rank insignia (optional)",p_st:"Status",p_kind:"Type",p_url:"Link",p_stream:"Stream",p_arch:"Archive"}
+};
+Object.assign(UI.ar,{a_nav:"الشريط الجانبي (الأسماء، الترتيب، الإضافة، الحذف)",a_navH:"غيّر اسم أي خانة ووصفها وأيقونتها، رتّبها بالأسهم، أخفِها أو أضف صفحة جديدة. الصفحات الأساسية بتنخفي وبترجع، أما الصفحة اللي بتضيفها فبتنحذف نهائياً. بعد ما تضيف صفحة افتحها وأضف محتواها بأزرار (+ شرح، فيديو، صور، جدول، خبر) اللي بأسفلها. التعديل على اللغة المختارة حالياً.",nv_name:"اسم الخانة",nv_desc:"وصف تحت العنوان (اختياري)",nv_icon:"الأيقونة",nv_hide:"إخفاء",nv_show:"إظهار",nv_add:"+ إضافة صفحة جديدة",nv_new:"صفحة جديدة",nv_delQ:"حذف هالصفحة نهائياً مع كل الخانات اللي فيها؟",nv_reset:"إرجاع الأسماء والترتيب للافتراضي",nv_resetQ:"إرجاع أسماء الشريط وترتيبه للافتراضي؟ الصفحات المضافة بتبقى.",nv_cust:"مضافة"});
+Object.assign(UI.en,{a_nav:"Sidebar (names, order, add, remove)",a_navH:"Rename any item, change its description and icon, reorder with the arrows, hide it, or add a new page. Built-in pages can be hidden and restored; a page you add is deleted permanently. After adding a page, open it and add its content with the buttons at its bottom (+ Text, Video, Images, Table, News). Edits apply to the currently selected language.",nv_name:"Item name",nv_desc:"Description under the title (optional)",nv_icon:"Icon",nv_hide:"Hide",nv_show:"Show",nv_add:"+ Add new page",nv_new:"New page",nv_delQ:"Delete this page permanently, with all its blocks?",nv_reset:"Reset names and order to default",nv_resetQ:"Reset sidebar names and order to default? Added pages stay.",nv_cust:"Added"});
+Object.assign(UI.ar,{dl_in:"دخول بحساب ديسكورد",dl_out:"خروج",dl_noid:"لازم الإدارة تضيف Discord Client ID من لوحة التحكم أول.",dl_err:"فشل تسجيل الدخول بديسكورد. جرّب مرة ثانية.",a_dcid:"Discord Client ID (لتسجيل الدخول بديسكورد)",a_dcidH:"من discord.com/developers/applications أنشئ تطبيق، وانسخ Application ID، وبقسم OAuth2 ضيف هالرابط بالضبط بخانة Redirects:"});
+Object.assign(UI.en,{dl_in:"Login with Discord",dl_out:"Log out",dl_noid:"An admin must add a Discord Client ID in the control panel first.",dl_err:"Discord login failed. Please try again.",a_dcid:"Discord Client ID (for Discord login)",a_dcidH:"Create an app at discord.com/developers/applications, copy the Application ID, and add this exact URL under OAuth2 Redirects:"});
+Object.assign(UI.ar,{jl_t:"لازم تسجّل دخول بديسكورد أول",jl_p:"قبل ما تقدّم لازم تسجّل دخول بحسابك بديسكورد، عشان نعرف مين صاحب الطلب.",f_did:"ديسكورد ID",a_jq:"أسئلة التقديم الإضافية",a_jqH:"بتظهر بنموذج التقديم بعد الأسئلة الأساسية. النوع: نص قصير، نص طويل، رقم، أو اختيارات (كل اختيار بسطر).",qt_text:"نص قصير",qt_long:"نص طويل",qt_num:"رقم",qt_choice:"اختيارات",p_opts:"الاختيارات (كل سطر)",p_req:"مطلوب؟",q_yes:"مطلوب",q_no:"اختياري",p_q:"السؤال",p_insUrl:"رابط صورة الشعار (اختياري)"});
+Object.assign(UI.en,{jl_t:"Log in with Discord first",jl_p:"You must log in with your Discord account before applying, so we know who the application belongs to.",f_did:"Discord ID",a_jq:"Extra application questions",a_jqH:"Shown on the application form after the basic questions. Type: short text, long text, number, or choices (one per line).",qt_text:"Short text",qt_long:"Long text",qt_num:"Number",qt_choice:"Choices",p_opts:"Choices (one per line)",p_req:"Required?",q_yes:"Required",q_no:"Optional",p_q:"Question",p_insUrl:"Insignia image link (optional)"});
+/* ======================= المنطق / Logic ======================= */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const KEY='portal_cfg_v2',LKEY='portal_lang',TKEY='portal_theme';
+const clone=o=>JSON.parse(JSON.stringify(o));
+let C=clone(CONFIG);
+try{const sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv)C=Object.assign(C,sv)}catch(_){}
+let lang='ar';try{lang=localStorage.getItem(LKEY)||((navigator.language||'').startsWith('ar')?'ar':'en')}catch(_){}
+let admin=false,isMem=false;try{isMem=sessionStorage.getItem('mem')==='1'}catch(_){}
+const canSee=v=>v!=='mem'||admin||isMem;
+const t=k=>(UI[lang][k]??UI.ar[k]??k);
+const L=o=>o==null?'':(typeof o==='string'?o:(o[lang]||o.ar||o.en||''));
+const esc=x=>String(x??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const nl=x=>esc(x).replace(/\n/g,'<br>');
+const degColor=d=>d<=1?'var(--ok)':d<=3?'var(--wr)':'var(--cr)';
+let warned=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(C));flash()}catch(e){if(!warned){warned=true;alert(t('a_imgBig'))}}}
+function flash(){const s=$('#savedTag');if(!s)return;s.classList.add('on');clearTimeout(flash.t);flash.t=setTimeout(()=>s.classList.remove('on'),1200)}
+async function sha(x){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(x));return[...new Uint8Array(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}catch(_){return'x'+x}}
+function readImg(f,max,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(f)}
+const ICON={hub:'M3 11l9-8 9 8v9h-6v-6H9v6H3z',about:'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8v.01M11 12h1v5h1',paths:'M5 4v16M5 8h8M5 16h12',rules:'M6 3h9l3 3v15H6zM9 11h6M9 15h6',sop:'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',fto:'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',access:'M6 11h12v9H6zM8 11V8a4 4 0 018 0v3',schedule:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',crew:'M9 11a3 3 0 100-6 3 3 0 000 6zM3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M17 8a2.5 2.5 0 010 5M17 14c2.5.3 4 2.5 4 5',media:'M4 5h16v14H4zM10 9l5 3-5 3z',credits:'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',join:'M4 20l4-1 11-11-3-3L5 16zM14 6l3 3',admin:'M12 9a3 3 0 100 6 3 3 0 000-6zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1'};
+const TABS=['hub','about','paths','rules','sop','fto','access','schedule','crew','media','credits','join'];
+/* ---- theme ---- */
+const PRESETS=[['#D8B26E','#0B0C0A'],['#E5484D','#0E0B0B'],['#4C8DFF','#090C12'],['#3FBF8A','#08100D'],['#9B7BFF','#0D0B14'],['#FF8A3D','#100B08'],['#7FD6E6','#0A1114'],['#B3361F','#F1ECE2']];
+let theme=clone(C.theme);try{const s=JSON.parse(localStorage.getItem(TKEY)||'null');if(s)theme=s}catch(_){}
+function lum(h){const n=parseInt(h.slice(1),16),f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(n>>16)+.7152*f(n>>8&255)+.0722*f(n&255)}
+function applyTheme(){const r=document.documentElement.style,light=lum(theme.bg)>.4;
+  r.setProperty('--bg',theme.bg);r.setProperty('--ac',theme.accent);r.setProperty('--mix',light?'#000':'#fff');r.setProperty('--tx',light?'#1B1A16':'#ECE8DF');
+  r.setProperty('--onac',lum(theme.accent)>.35?'#14130F':'#FFF')}
+function setTheme(a,b){theme={accent:a,bg:b};try{localStorage.setItem(TKEY,JSON.stringify(theme))}catch(_){}applyTheme();$('#cAc').value=a;$('#cBg').value=b}
+/* ---- static text ---- */
+function applyLang(){
+  document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  try{localStorage.setItem(LKEY,lang)}catch(_){}
+  $('#langBtn').textContent=t('lang');$('#themeBtn').textContent=t('theme');$('#liveTxt').textContent=t('live');
+  $('#lockBtn').textContent=admin?t('unlock'):'🔒 '+t('lock');$('#memBtn').textContent=isMem?t('m_out'):'🔑 '+t('m_in');
+  $('#hubJoin').textContent=t('join');$('#hubDc').textContent=t('dc');$('#clkSub').textContent=t('ops');
+  $('#agTitle').textContent=t('agT');$('#agText').textContent=t('agP');$('#agLbl').textContent=t('agL');$('#agOk').textContent=t('agOk');$('#agNo').textContent=t('agNo');
+  $('#cdTitle').textContent=t('cdT');$('#cdText').textContent=t('cdP');$('#codeOk').textContent=t('cdOk');$('#codeNo').textContent=t('cdNo');$('#codeErr').textContent=t('cdErr');
+  $('#gBtn').textContent=t('gOk');$('#gIn').placeholder=t('gPh');
+  $('#thTitle').textContent=t('thT');$('#thText').textContent=t('thP');$('#thAc').textContent=t('thAc');$('#thBg').textContent=t('thBg');$('#thOk').textContent=t('thOk');$('#thReset').textContent=t('thReset');dlLabel();
+}
+/* ---- views skeleton ---- */
+const SK=TABS.filter(x=>x!=='hub').concat(['admin']);
+$('#views').innerHTML=SK.map(k=>`<section class="view" id="v-${k}"><div class="vh"><div><h2 id="h-${k}"></h2><p id="p-${k}"></p></div></div><div id="c-${k}"></div><div class="bk" id="b-${k}"></div></section>`).join('');
+/* ---- sidebar editor helpers (names / order / hide / custom pages) ---- */
+const BASE_TABS=TABS.slice();
+function navCfg(){const n=C.nav=C.nav||{};n.names=n.names||{};n.descs=n.descs||{};n.hidden=n.hidden||{};n.icons=n.icons||{};n.custom=n.custom||[];n.order=n.order||[];return n}
+function pn(k){const n=navCfg(),o=n.names[k];if(o&&o[lang])return o[lang];if(BASE_TABS.includes(k)||k==='admin')return t('n_'+k);return(o&&(o.ar||o.en))||'—'}
+function pd(k){const o=navCfg().descs[k];if(o&&o[lang])return o[lang];if(BASE_TABS.includes(k)){const d=t('d_'+k);return d===('d_'+k)?'':d}return''}
+function navIcon(k){const n=navCfg();return ICON[n.icons[k]]||ICON[k]||ICON.rules}
+function syncNav(){const n=navCfg();
+  const ids=BASE_TABS.concat(n.custom.map(c=>c.id));
+  const o=n.order.filter(k=>ids.includes(k));ids.forEach(k=>{if(!o.includes(k))o.push(k)});n.order=o;
+  TABS.splice(0,TABS.length,...o);
+  SK.splice(0,SK.length,...o.filter(k=>k!=='hub'),'admin');
+  const host=$('#views');
+  [...host.children].forEach(s=>{if(!SK.includes(s.id.slice(2)))s.remove()});
+  SK.forEach(k=>{if(!$('#v-'+k)){const s=document.createElement('section');s.className='view';s.id='v-'+k;s.innerHTML=`<div class="vh"><div><h2 id="h-${k}"></h2><p id="p-${k}"></p></div></div><div id="c-${k}"></div><div class="bk" id="b-${k}"></div>`;host.appendChild(s)}})}
+/* ---- render ---- */
+let ruleQ='',ruleD='all',sopI=0,crewF='all';
+function renderAll(){
+  applyLang();
+  const nm=L(C.name);document.title=nm+' | Command Portal';
+  $('#brandName').textContent=nm;$('#topName').textContent=nm;$('#bootName').textContent=nm;$('#gName').textContent=nm;$('#fName').textContent='© 2026 '+nm;$('#fSrv').textContent=C.server;
+  $('#brandSub').textContent=C.server+' Command Portal';
+  ['#mark','#gMark'].forEach(s=>$(s).textContent=C.short);
+  $('#hubTitle').textContent=nm;$('#hubTag').textContent=L(C.tagline);
+  [$('#dcBtn'),$('#hubDc')].forEach(a=>a.href=C.discord||'#');
+  $('#ledger').innerHTML=C.stats.map(s=>`<div><span>${esc(L(s.l))}</span><i></i><b>${esc(s.n)}</b></div>`).join('');
+  $('#mosaic').innerHTML=[0,1,2,3].map(i=>{const u=C.gallery[i];return `<div>${u?`<img src="${u}" alt="">`:t('noimg')}</div>`}).join('');
+  const bg=C.bg||{};$('#bgLayer').style.backgroundImage=bg.img?`linear-gradient(color-mix(in srgb,var(--bg) ${Math.round(bg.dim*100)}%,transparent),color-mix(in srgb,var(--bg) ${Math.round(bg.dim*100)}%,transparent)),url("${bg.img}")`:'none';
+  syncNav();SK.forEach(k=>{$('#h-'+k).textContent=pn(k);const p=$('#p-'+k),d=pd(k);p.textContent=d;p.style.display=d?'':'none'});
+  drawNav();
+  $('#c-about').innerHTML=`<p class="lead">${nl(L(C.about))}</p><div class="rows">${C.values.map(v=>`<div><h3>${esc(L(v.t))}</h3><p>${nl(L(v.d))}</p></div>`).join('')}</div>`;
+  $('#c-paths').innerHTML=`<div class="paths">${C.paths.map(p=>`<div><h3>${esc(L(p.t))}</h3><p>${esc(L(p.d))}</p><ul class="ladder">${L(p.r).split('\n').filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div>`;
+  drawRules();drawSop();
+  $('#c-fto').innerHTML=`<div class="fto">${C.fto.map((f,i)=>`<div><span class="n">${i+1}</span><h3>${esc(L(f.t))}</h3><small>${esc(L(f.dur))}</small><p>${nl(L(f.d))}</p></div>`).join('')}</div>`;
+  $('#c-access').innerHTML=`<div class="tw"><table><thead><tr><th>${t('p_role')}</th><th>${t('p_perms').replace(/\(.*\)|（.*）/,'')}</th></tr></thead><tbody>${C.access.map(a=>`<tr><td><b>${esc(L(a.role))}</b></td><td>${L(a.perms).split('\n').filter(Boolean).map(x=>`<span class="perm">${esc(x)}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div>`;
+  const sNote=L(C.schedule.note||'');
+  $('#c-schedule').innerHTML=`<div class="milnote"><h4>${esc(t('sInfoT'))}</h4>${sNote?`<p>${nl(sNote)}</p>`:''}<div class="lg"><b>${esc(t('sLeg'))}:</b><span><i></i>${t('on')}</span><span><i class="off"></i>${t('off')}</span><span><i class="lv"></i>${t('lv')}</span><span>${esc(t('sInsHint'))}</span></div></div>`+
+    `<div class="tw mil"><table><caption>${esc(L(C.name))} // ${esc(t('n_schedule')).toUpperCase()} // ${esc(C.server)}</caption><thead><tr><th>${t('cName')}</th><th>${t('cRank')}</th><th>${t('cCode')}</th><th>${t('cStatus')}</th><th>${t('cIns')}</th></tr></thead><tbody>${C.schedule.rows.map(r=>{const st=r.st||'on';return `<tr><td><b>${esc(L(r.name)||L(r.day))}</b></td><td>${esc(L(r.rank)||L(r.act))}</td><td><span class="mil-code" dir="ltr">${esc(r.code||r.time||'—')}</span></td><td><span class="pill ${st}">${t(st)}</span></td><td>${(r.insFile||r.insUrl)?`<img class="insimg" src="${esc(r.insFile||r.insUrl)}" alt="${esc(rankIns(r))}" title="${esc(rankIns(r))}">`:`<span class="ins" title="${esc(t('sInsHint'))}">${esc(rankIns(r))}</span>`}</td></tr>`}).join('')}</tbody></table></div>`;
+  drawCrew();
+  const grp=k=>C.media.filter(m=>m.kind===k).map(m=>`<div class="mi"><div class="th">${m.img?`<img src="${m.img}" alt="">`:'▶'}</div><b>${esc(L(m.t))}</b><a class="btn gh sm" href="${esc(m.url||'#')}" target="_blank" rel="noopener">${t('open')}</a></div>`).join('');
+  $('#c-media').innerHTML=`<div class="mg"><h3>${t('streams')}</h3>${grp('stream')}<h3>${t('archives')}</h3>${grp('archive')}</div>`;
+  $('#c-credits').innerHTML=`<ul class="cr">${C.credits.map(c=>`<li><b>${esc(c.name)}</b><i></i><span>${esc(L(c.role))}</span></li>`).join('')}</ul>`;
+  drawJoin();drawBlocks();
+}
+function drawNav(){
+  const n=navCfg(),vis=k=>k==='hub'||canSee((C.pageVis||{})[k]);
+  const all=TABS.filter(k=>admin||(!n.hidden[k]&&vis(k))).concat(admin?['admin']:[]);const cur=(location.hash.slice(1))||'hub';
+  $('#nav').innerHTML=all.map(k=>`<button data-t="${k}" class="${k===cur?'on':''}${n.hidden[k]?' hid':''}"><svg viewBox="0 0 24 24"><path d="${navIcon(k)}"/></svg>${esc(pn(k))}</button>`).join('');
+  $$('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+  const jb=$('#hubJoin');if(jb)jb.style.display=(!admin&&(n.hidden.join||!vis('join')))?'none':'';
+}
+function drawRules(){
+  const degs=['all',...[...new Set(C.rules.map(r=>r.deg))].sort()];
+  const q=ruleQ;
+  $('#c-rules').innerHTML=`<div class="tool"><input class="search" id="rs" placeholder="${esc(t('search'))}" value="${esc(q)}"><div class="chips" id="rd">${degs.map(d=>`<button data-d="${d}" class="${d===ruleD?'on':''}">${d==='all'?t('all'):d}</button>`).join('')}</div></div><div id="rl"></div>`;
+  const list=()=>{const rows=C.rules.filter(r=>(ruleD==='all'||r.deg===ruleD)&&(L(r.t)+L(r.d)).toLowerCase().includes(ruleQ.toLowerCase()));
+    $('#rl').innerHTML=rows.map(r=>`<div class="acc" style="--c:${degColor(+r.deg)}"><button><span class="dg">${esc(r.deg)}</span>${esc(L(r.t))}<span class="ch">▾</span></button><div class="bd"><div>${nl(L(r.d))}</div></div></div>`).join('')||`<p style="color:var(--mu)">${t('none')}</p>`;
+    $$('.acc>button').forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'))};
+  list();
+  $('#rs').oninput=e=>{ruleQ=e.target.value.trim();list()};
+  $$('#rd button').forEach(b=>b.onclick=()=>{ruleD=b.dataset.d;$$('#rd button').forEach(x=>x.classList.toggle('on',x===b));list()});
+}
+function drawSop(){
+  if(sopI>=C.sop.length)sopI=0;
+  $('#c-sop').innerHTML=`<div class="sop"><div class="side">${C.sop.map((s,i)=>`<button class="${i===sopI?'on':''}" data-i="${i}">${esc(L(s.t))}</button>`).join('')}</div><div class="doc">${C.sop[sopI]?`<h3>${esc(L(C.sop[sopI].t))}</h3><ul>${L(C.sop[sopI].d).split('\n').filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div></div>`;
+  $$('.side button').forEach(b=>b.onclick=()=>{sopI=+b.dataset.i;drawSop()});
+}
+const INS_MAP=[[/قائد|commander|leader/i,'★★★'],[/نائب|deputy/i,'★★☆'],[/ضابط|officer/i,'★☆☆'],[/متدرب|trainee/i,'○'],[/عضو|member/i,'●']];
+function rankIns(c){const custom=(c.ins||'').trim();if(custom)return custom;
+  const hit=INS_MAP.find(([re])=>re.test(L(c.rank)||''));return hit?hit[1]:'◆'}
+function drawCrew(){
+  const f=[['all',t('all')],['on',t('on')],['off',t('off')],['lv',t('lv')]];
+  const note=L(C.crewNote||''),st=c=>c.st||'on';
+  const card=c=>{const i=C.crew.indexOf(c),nw=(c.warns||'').split('\n').filter(Boolean).length;
+    return `<article class="mcard"><div class="ph${admin?' adm':''}" data-m="${i}" title="${admin?esc(t('m_adm')):''}">${c.img?`<img src="${esc(c.img)}" alt="">`:`<span class="ins" title="${esc(t('sInsHint'))}">${esc(rankIns(c))}</span>`}</div><div class="bd"><h4>${esc(c.name)}${admin&&nw?`<span class="wn">⚠ ${nw}</span>`:''}</h4><div class="rk">${esc(L(c.rank))}</div><div class="ml"><span class="mil-code" dir="ltr">${esc(c.code||'—')}</span><span class="pill ${st(c)}">${t(st(c))}</span></div>${c.joined?`<div style="margin-top:8px;font-size:.8rem;color:var(--mu)">${esc(t('p_joined'))}: ${esc(c.joined)}</div>`:''}</div></article>`};
+  $('#c-crew').innerHTML=`<div class="milnote"><h4>${esc(t('crInfoT'))}</h4>${note?`<p>${nl(note)}</p>`:''}<div class="lg"><b>${esc(t('sLeg'))}:</b><span><i></i>${t('on')}</span><span><i class="off"></i>${t('off')}</span><span><i class="lv"></i>${t('lv')}</span><span>${esc(t('sInsHint'))}</span></div></div><div class="tool"><div class="chips">${f.map(x=>`<button data-f="${x[0]}" class="${x[0]===crewF?'on':''}">${x[1]}</button>`).join('')}</div></div><div class="milgrid">${C.crew.filter(c=>crewF==='all'||st(c)===crewF).map(card).join('')}</div>`;
+  $$('#c-crew .ph[data-m]').forEach(a=>a.onclick=()=>openMem(+a.dataset.m));
+  $$('#c-crew .chips button').forEach(b=>b.onclick=()=>{crewF=b.dataset.f;drawCrew()});
+}
+let reqTxt='';
+function drawJoin(){
+  const logged=(typeof DU!=='undefined'&&DU)||admin;
+  if(!logged){
+    $('#c-join').innerHTML=`<div class="milnote"><h4>🔒 ${esc(t('jl_t'))}</h4><p>${esc(t('jl_p'))}</p><button class="btn" id="jLogin" style="margin-top:14px">🎮 ${esc(t('dl_in'))}</button></div>`;
+    $('#jLogin').onclick=()=>$('#dlBtn').click();return}
+  const jq=C.joinQs||[],du=(typeof DU!=='undefined'&&DU)||null;
+  const qf=(q,i)=>{const rq=q.req==='0'?'':' required',lb=esc(L(q.t));let f;
+    if(q.k==='long')f=`<textarea id="jq${i}"${rq}></textarea>`;
+    else if(q.k==='number')f=`<input id="jq${i}" type="number" min="0"${rq}>`;
+    else if(q.k==='choice')f=`<select id="jq${i}">${L(q.o).split('\n').filter(Boolean).map(x=>`<option>${esc(x)}</option>`).join('')}</select>`;
+    else f=`<input id="jq${i}"${rq}>`;
+    return `<label>${lb}${f}</label>`};
+  $('#c-join').innerHTML=`<form id="jf"><label>${t('f1')}<input id="j1" required></label><label>${t('f2')}<input id="j2" required${du?' readonly value="'+esc(du.user)+'"':''}></label>${du?`<label>${t('f_did')}<input id="jid" readonly dir="ltr" value="${esc(du.id)}"></label>`:''}<label>${t('f3')}<input id="j3" type="number" min="10" max="99" required></label><label>${t('f4')}<select id="j4"><option>${t('lv1')}</option><option>${t('lv2')}</option><option>${t('lv3')}</option></select></label><label>${t('f5')}<textarea id="j5" required></textarea></label>${jq.map(qf).join('')}<button class="btn" type="submit">${t('build')}</button></form><div id="out"></div><button class="btn gh" id="cp" style="display:none;margin-top:12px">${t('copy')}</button>`;
+  $('#jf').onsubmit=e=>{e.preventDefault();
+    const ex=jq.map((q,i)=>{const el=$('#jq'+i);return `${L(q.t)}: ${el?el.value:''}`}).join('\n');
+    reqTxt=`${t('reqT')} - ${L(C.name)}\n${t('f1')}: ${$('#j1').value}\n${t('f2')}: ${$('#j2').value}\n${du?t('f_did')+': '+du.id+'\n':''}${t('f3')}: ${$('#j3').value}\n${t('f4')}: ${$('#j4').value}\n${t('f5')}: ${$('#j5').value}${ex?'\n'+ex:''}`;
+    const o=$('#out');o.textContent=reqTxt;o.style.display='block';$('#cp').style.display='inline-flex'};
+  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(reqTxt);$('#cp').textContent=t('copied')}catch(_){$('#cp').textContent=t('copyFail')}};
+}
+
+/* ---- custom blocks ---- */
+function vid(u){u=(u||'').trim();if(!u)return'';let m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  if(m)return `<iframe src="https://www.youtube.com/embed/${m[1]}" allowfullscreen loading="lazy"></iframe>`;
+  m=u.match(/vimeo\.com\/(\d+)/);if(m)return `<iframe src="https://player.vimeo.com/video/${m[1]}" allowfullscreen loading="lazy"></iframe>`;
+  const web=/^https?:/i.test(u);
+  if(/\.(mp4|webm|ogg|mov)(\?|$)/i.test(u)&&(web||/^[\w.\/%-]+$/.test(u)))return `<video controls playsinline preload="metadata" src="${esc(u)}"></video>`;
+  if(!web)return'';
+  return `<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${t('open')}</a>`}
+function blkHtml(b){const h=b.t&&L(b.t)?`<h3>${esc(L(b.t))}</h3>`:'',im=b.imgs||[];
+  if(b.type==='text'){const k=L(b.k),bl=L(b.bl),u=/^https?:/i.test(b.url||'')?b.url:'';
+    const vh=vid(b.vu),side=vh?`<div class="vid">${vh}</div>`:(im[0]?`<img src="${esc(im[0])}" alt="">`:'');
+    return `<div class="blk expl${side?' has':''}"><div class="ex">${k?`<span class="nd">${esc(k)}</span>`:''}${h}<p>${nl(L(b.d))}</p>${bl&&u?`<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">${esc(bl)}</a>`:''}</div>${side}</div>`}
+  if(b.type==='video')return `<div class="blk">${h}<div class="vid">${vid(b.url)}</div></div>`;
+  if(b.type==='images')return `<div class="blk">${h}<div class="gal">${im.map(u=>`<img src="${esc(u)}" alt="" loading="lazy">`).join('')}</div></div>`;
+  if(b.type==='table'){const r=L(b.rows).split('\n').filter(Boolean).map(l=>l.split('|').map(c=>c.trim()));
+    return `<div class="blk">${h}${r.length?`<div class="tw"><table><thead><tr>${r[0].map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${r.slice(1).map(x=>`<tr>${x.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}</div>`}
+  if(b.type==='news')return `<article class="blk news">${im[0]?`<img src="${esc(im[0])}" alt="">`:''}<div>${b.date?`<span class="nd">${esc(b.date)}</span>`:''}${h}<p>${nl(L(b.d))}</p></div></article>`;
+  return''}
+function newBlock(ty,pg){return{type:ty,page:pg,vu:'',t:B('عنوان','Title'),k:B('',''),bl:B('',''),d:B('',''),rows:B('',''),url:'',date:'',imgs:[]}}
+function drawBlocks(){TABS.forEach(k=>{const e=$('#b-'+k);if(!e)return;
+  let s=(C.blocks||[]).map((b,i)=>({b,i})).filter(x=>x.b.page===k&&(admin||canSee(x.b.vis))).map(x=>admin?blkHtml(x.b).replace(/^(<\w+ class="[^"]*")/,'$1 data-i="'+x.i+'"').replace(/>/,'>'+'<button class="be" data-i="'+x.i+'" title="edit">✎</button>'):blkHtml(x.b)).join('');
+  if(admin)s+=`<div class="addbar"><span>${t('a_add')}</span>${['text','video','images','table','news'].map(y=>`<button class="btn gh sm" data-ty="${y}">${t('bt_'+y)}</button>`).join('')}</div>`;
+  e.innerHTML=s;
+  $$('#b-'+k+' .be').forEach(b=>b.onclick=()=>openEd(+b.dataset.i));
+  $$('#b-'+k+' .addbar button').forEach(b=>b.onclick=()=>{C.blocks.push(newBlock(b.dataset.ty,k));commit();openEd(C.blocks.length-1)})})}
+function openEd(i){drawAdmin();go('admin');setTimeout(()=>{const el=$('.blk-ed[data-i="'+i+'"]');if(el){el.scrollIntoView({block:'center'});el.style.boxShadow='0 0 0 3px var(--ac)'}},60)}
+function edBlocks(host){
+  if(!C.blocks)C.blocks=[];
+  const mk=(tag,cls,txt,fn)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;if(fn)e.onclick=fn;return e};
+  const draw=()=>{host.innerHTML='';
+    C.blocks.forEach((b,i)=>{const d=mk('div','blk-ed'),hd=mk('div','row');d.dataset.i=i;
+      hd.appendChild(mk('b',0,t('bt_'+b.type)));
+      const pg=document.createElement('select');TABS.forEach(k=>pg.add(new Option(pn(k),k)));pg.value=b.page;pg.onchange=()=>{b.page=pg.value;commit()};hd.appendChild(pg);hd.appendChild(visSel(b.vis,v=>{b.vis=v;commit()}));
+      [['↑',-1],['↓',1]].forEach(([s,dr])=>hd.appendChild(mk('button','btn gh sm',s,()=>{const j=i+dr;if(j<0||j>=C.blocks.length)return;[C.blocks[i],C.blocks[j]]=[C.blocks[j],C.blocks[i]];draw();commit()})));
+      hd.appendChild(mk('button','x','✕',()=>{C.blocks.splice(i,1);draw();commit()}));d.appendChild(hd);
+      const f=(ph,get,set,ta)=>{const e=document.createElement(ta?'textarea':'input'),w=mk('div','row');e.placeholder=ph;e.value=get();e.oninput=()=>{set(e.value);commit()};if(!ta)e.style.flex='1 1 100%';else e.style.cssText='flex:1 1 100%;height:90px';w.appendChild(e);d.appendChild(w)};
+      f(t('p_t'),()=>L(b.t),v=>setI(b,'t',v));
+      if(b.type==='text'||b.type==='news')f(t('p_body'),()=>L(b.d),v=>setI(b,'d',v),1);
+      if(b.type==='text'){f(t('p_vid'),()=>b.vu||'',v=>b.vu=v);f(t('p_kick'),()=>L(b.k),v=>setI(b,'k',v));f(t('p_btn'),()=>L(b.bl),v=>setI(b,'bl',v));f(t('p_url'),()=>b.url||'',v=>b.url=v)}
+      if(b.type==='news')f(t('p_date'),()=>b.date||'',v=>b.date=v);
+      if(b.type==='video')f(t('p_vurl'),()=>b.url||'',v=>b.url=v);
+      if(b.type==='table')f(t('p_tbl'),()=>L(b.rows),v=>setI(b,'rows',v),1);
+      if(b.type==='images'||b.type==='news'||b.type==='text'){
+        const w=mk('div','row'),lb=mk('label','btn gh sm fbtn');lb.style.cssText='display:inline-flex;width:auto;color:var(--tx)';lb.append(t('a_up'));
+        const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.multiple=b.type==='images';
+        fi.onchange=e=>{[...e.target.files].forEach(fl=>readImg(fl,1000,u=>{if(!b.imgs)b.imgs=[];if(b.type!=='images')b.imgs=[u];else b.imgs.push(u);draw();commit()}))};lb.appendChild(fi);w.appendChild(lb);
+        const th=mk('div','thumbs');(b.imgs||[]).forEach((u,k)=>{const s=mk('span');const im=document.createElement('img');im.src=u;s.appendChild(im);s.appendChild(mk('button',0,'✕',()=>{b.imgs.splice(k,1);draw();commit()}));th.appendChild(s)});w.appendChild(th);d.appendChild(w)}
+      host.appendChild(d)});
+    const ad=mk('div','rt');
+    ['text','video','images','table','news'].forEach(ty=>ad.appendChild(mk('button','btn sm','+ '+t('bt_'+ty),()=>{C.blocks.push(newBlock(ty,'hub'));draw();commit()})));
+    host.appendChild(ad)};
+  draw()}
+/* ---- member private card (admin only) ---- */
+function openMem(i){if(!admin)return;const c=C.crew[i];if(!c)return;const w=(c.warns||'').split('\n').filter(Boolean);
+  $('#memBody').innerHTML=`<span class="nd">🔒 ${t('m_adm')}</span><div class="mh"><span class="av big">${c.img?`<img src="${esc(c.img)}" alt="">`:esc((c.name||'?').slice(0,1).toUpperCase())}</span><div><h3>${esc(c.name)}</h3><span>${esc(L(c.rank))} · <span class="pill ${c.st}">${t(c.st)}</span></span></div></div><div class="mk"><span>${t('p_code')}</span><b dir="ltr">${esc(c.code||'—')}</b></div><div class="mk"><span>${t('p_joined')}</span><b>${esc(c.joined||'—')}</b></div><div class="mk"><span>${t('p_did')}</span><b dir="ltr">${esc(c.did||'—')}</b></div><h4>⚠ ${t('m_warns')} (${w.length})</h4>${w.length?`<ul class="wl">${w.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p class="mt">${t('none')}</p>`}<h4>${t('p_notes')}</h4><p>${c.notes?nl(c.notes):'—'}</p>`;
+  $('#memX').textContent=t('m_close');$('#memModal').classList.add('on')}
+$('#memX').onclick=()=>$('#memModal').classList.remove('on');
+$('#memModal').onclick=e=>{if(e.target.id==='memModal')$('#memModal').classList.remove('on')};
+/* ---- member access (visitors vs members) ---- */
+$('#memBtn').onclick=()=>{if(isMem){isMem=false;try{sessionStorage.removeItem('mem')}catch(_){}renderAll();go('hub');return}
+  $('#mcT').textContent=t('m_t');$('#mcP').textContent=t('m_p');$('#mcOk').textContent=t('cdOk');$('#mcNo').textContent=t('cdNo');$('#mcErr').textContent=t('cdErr');$('#mcErr').style.display='none';$('#mcIn').value='';$('#mcModal').classList.add('on');$('#mcIn').focus()};
+$('#mcNo').onclick=()=>$('#mcModal').classList.remove('on');
+$('#mcOk').onclick=async()=>{if(C.memHash&&await sha($('#mcIn').value)===C.memHash){isMem=true;try{sessionStorage.setItem('mem','1')}catch(_){}$('#mcModal').classList.remove('on');renderAll()}else $('#mcErr').style.display='block'};
+$('#mcIn').onkeydown=e=>{if(e.key==='Enter')$('#mcOk').click()};
+function visSel(cur,fn){const s=document.createElement('select');[['all',t('v_all')],['mem',t('v_mem')]].forEach(o=>s.add(new Option(o[1],o[0])));s.value=cur||'all';s.onchange=()=>fn(s.value);return s}
+function edVis(host){C.pageVis=C.pageVis||{};host.innerHTML='';
+  TABS.filter(k=>k!=='hub').forEach(k=>{const r=document.createElement('div'),l=document.createElement('b');r.className='row';l.textContent=pn(k);l.style.flex='1 1 140px';r.append(l,visSel(C.pageVis[k],v=>{C.pageVis[k]=v;commit()}));host.appendChild(r)});
+  const w=document.createElement('div'),i=document.createElement('input'),b=document.createElement('button');w.className='row';i.placeholder=t('v_code');b.className='btn sm';b.textContent=t('a_gateSet');
+  b.onclick=async()=>{if(i.value.length<4){alert(t('a_codeShort'));return}C.memHash=await sha(i.value);save();i.value='';alert(t('a_codeDone'))};w.append(i,b);host.appendChild(w)}
+/* ---- routing ---- */
+function go(k){
+  if(!(TABS.includes(k)||(k==='admin'&&admin)))k='hub';
+  if(k!=='hub'&&k!=='admin'&&!canSee((C.pageVis||{})[k]))k='hub';
+  if(k!=='hub'&&k!=='admin'&&!admin&&navCfg().hidden[k])k='hub';
+  $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+k));
+  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===k));
+  if(location.hash!=='#'+k)location.hash=k;
+  document.body.classList.remove('menu');scrollTo(0,0);
+  if(k==='join'&&!$('#agree').dataset.ok)$('#agreeModal').classList.add('on');
+}
+addEventListener('hashchange',()=>go(location.hash.slice(1)));
+$$('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+$('#menuBtn').onclick=()=>document.body.classList.toggle('menu');
+$('#main').onclick=()=>document.body.classList.remove('menu');
+$('#langBtn').onclick=()=>{lang=lang==='ar'?'en':'ar';renderAll();if(admin)drawAdmin()};
+$('#agOk').onclick=()=>{if($('#agree').checked){$('#agree').dataset.ok=1;$('#agreeModal').classList.remove('on')}};
+$('#agNo').onclick=()=>{$('#agreeModal').classList.remove('on');go('rules')};
+/* clock */
+function tick(){const d=new Date();$('#clk').textContent=d.toLocaleTimeString(lang==='ar'?'ar-EG-u-nu-latn':'en-GB',{hour:'2-digit',minute:'2-digit'})}
+setInterval(tick,1000);
+/* ---- theme modal ---- */
+$('#sw').innerHTML=PRESETS.map((p,i)=>`<button style="--a:${p[0]};--b:${p[1]}" data-i="${i}" aria-label="preset ${i+1}"></button>`).join('');
+$$('#sw button').forEach(b=>b.onclick=()=>setTheme(...PRESETS[+b.dataset.i]));
+$('#cAc').oninput=e=>setTheme(e.target.value,theme.bg);$('#cBg').oninput=e=>setTheme(theme.accent,e.target.value);
+$('#themeBtn').onclick=()=>{$('#cAc').value=theme.accent;$('#cBg').value=theme.bg;$('#themeModal').classList.add('on')};
+$('#thOk').onclick=()=>$('#themeModal').classList.remove('on');
+$('#thReset').onclick=()=>{try{localStorage.removeItem(TKEY)}catch(_){}setTheme(C.theme.accent,C.theme.bg)};
+/* ---- admin gate ---- */
+$('#lockBtn').onclick=()=>{if(admin){admin=false;try{sessionStorage.removeItem('adm')}catch(_){}applyLang();drawNav();drawBlocks();drawCrew();drawJoin();go('hub')}else{$('#codeIn').value='';$('#codeErr').style.display='none';$('#codeModal').classList.add('on');$('#codeIn').focus()}};
+$('#codeNo').onclick=()=>$('#codeModal').classList.remove('on');
+$('#codeOk').onclick=async()=>{if(await sha($('#codeIn').value)===C.adminHash){$('#codeModal').classList.remove('on');admin=true;try{sessionStorage.setItem('adm','1')}catch(_){}applyLang();drawAdmin();drawNav();drawBlocks();drawCrew();drawJoin();go('admin')}else $('#codeErr').style.display='block'};
+$('#codeIn').onkeydown=e=>{if(e.key==='Enter')$('#codeOk').click()};
+/* ---- site gate ---- */
+function gateCheck(){let ok=false;try{ok=sessionStorage.getItem('gate')==='1'}catch(_){}if(C.gate.on&&!ok)$('#gate').classList.add('on')}
+$('#gForm').onsubmit=async e=>{e.preventDefault();if(await sha($('#gIn').value)===C.gate.hash){try{sessionStorage.setItem('gate','1')}catch(_){}$('#gate').classList.remove('on')}else{$('#gErr').textContent=t('cdErr');$('#gErr').style.display='block'}};
+/* ---- admin panel ---- */
+function commit(){save();renderAll()}
+function setI(row,k,v){if(typeof row[k]!=='object'||row[k]===null)row[k]={ar:row[k]||'',en:row[k]||''};row[k][lang]=v}
+function listEd(host,arr,fields,mk){
+  const draw=()=>{host.innerHTML='';
+    arr.forEach((row,ri)=>{const d=document.createElement('div');d.className='row';
+      fields.forEach(f=>{let el;
+        if(f.t==='s'){el=document.createElement('select');f.o.forEach(o=>{const op=document.createElement('option');op.value=o[0];op.textContent=o[1];el.appendChild(op)});el.value=row[f.k];el.onchange=()=>{row[f.k]=el.value;commit()}}
+        else if(f.t==='f'){el=document.createElement('label');el.className='btn gh sm fbtn';el.style.cssText='display:inline-flex;width:auto;color:var(--tx)';el.innerHTML=(row[f.k]?'✓ ':'')+t('a_img')+'<input type="file" accept="image/*">';el.querySelector('input').onchange=e=>{const fl=e.target.files[0];if(fl)readImg(fl,1000,u=>{row[f.k]=u;commit();draw()})}}
+        else if(f.t==='c'){el=document.createElement('button');el.className='btn gh sm';el.textContent=f.l;el.onclick=()=>{row[f.k]='';draw();commit()}}
+        else{el=document.createElement(f.t==='a'||f.t==='A'||f.t==='P'?'textarea':'input');el.placeholder=f.l;el.title=f.l;
+          const i18n=f.t==='i'||f.t==='A';
+          el.value=i18n?L(row[f.k]):(row[f.k]??'');
+          if(f.t==='a'){el.value=L(row[f.k])}
+          el.oninput=()=>{if(i18n||f.t==='a')setI(row,f.k,el.value);else row[f.k]=el.value;commit()}}
+        d.appendChild(el)});
+      const x=document.createElement('button');x.className='x';x.textContent='✕';x.onclick=()=>{arr.splice(ri,1);draw();commit()};d.appendChild(x);host.appendChild(d)});
+    const a=document.createElement('button');a.className='btn gh sm';a.textContent=t('a_add');a.onclick=()=>{arr.push(mk());draw();commit()};host.appendChild(a)};
+  draw()}
+function edNav(host){
+  const n=navCfg();
+  const mk=(tag,cls,txt,fn)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;if(fn)e.onclick=fn;return e};
+  const refresh=()=>{edVis($('#e_vis'));edBlocks($('#e_blocks'))};
+  const setN=(map,k,v)=>{map[k]=map[k]||{};map[k][lang]=v};
+  const draw=()=>{host.innerHTML='';
+    TABS.forEach((k,i)=>{
+      const cu=n.custom.some(c=>c.id===k),hid=!!n.hidden[k],box=mk('div','blk-ed');
+      const r1=mk('div','row nvrow');
+      const ni=document.createElement('input');ni.placeholder=t('nv_name');ni.value=pn(k);ni.style.flex='2 1 150px';
+      ni.oninput=()=>{setN(n.names,k,ni.value);commit()};ni.onchange=refresh;r1.appendChild(ni);
+      const ic=document.createElement('select');ic.title=t('nv_icon');
+      Object.keys(ICON).filter(x=>x!=='admin').forEach(x=>ic.add(new Option('◈ '+(BASE_TABS.includes(x)?t('n_'+x):x),x)));
+      ic.value=n.icons[k]||(BASE_TABS.includes(k)?k:'rules');ic.onchange=()=>{n.icons[k]=ic.value;commit()};r1.appendChild(ic);
+      [['↑',-1],['↓',1]].forEach(([s,dr])=>r1.appendChild(mk('button','btn gh sm nvi',s,()=>{const j=i+dr;if(j<0||j>=n.order.length)return;[n.order[i],n.order[j]]=[n.order[j],n.order[i]];commit();draw();refresh()})));
+      if(k!=='hub')r1.appendChild(mk('button','btn gh sm nvi',hid?t('nv_show'):t('nv_hide'),()=>{n.hidden[k]=!hid;commit();draw()}));
+      if(cu){r1.appendChild(mk('b',0,t('nv_cust')));
+        r1.appendChild(mk('button','x','✕',()=>{if(!confirm(t('nv_delQ')))return;
+          n.custom=n.custom.filter(c=>c.id!==k);[n.names,n.descs,n.icons,n.hidden].forEach(m=>delete m[k]);if(C.pageVis)delete C.pageVis[k];
+          C.blocks=(C.blocks||[]).filter(b=>b.page!==k);n.order=n.order.filter(x=>x!==k);commit();draw();refresh()}))}
+      box.appendChild(r1);
+      const r2=mk('div','row'),di=document.createElement('input');di.placeholder=t('nv_desc');di.value=(n.descs[k]&&n.descs[k][lang])||'';di.style.flex='1 1 100%';
+      di.oninput=()=>{setN(n.descs,k,di.value);commit()};r2.appendChild(di);box.appendChild(r2);
+      host.appendChild(box)});
+    const ad=mk('div','rt');
+    ad.appendChild(mk('button','btn sm',t('nv_add'),()=>{const id='p'+Date.now().toString(36);n.custom.push({id});n.names[id]={ar:UI.ar.nv_new,en:UI.en.nv_new};n.order.push(id);commit();draw();refresh()}));
+    ad.appendChild(mk('button','btn gh sm',t('nv_reset'),()=>{if(!confirm(t('nv_resetQ')))return;
+      const cs=n.custom.map(c=>c.id),keep={};cs.forEach(id=>{keep[id]=n.names[id]});
+      n.names=keep;n.descs={};n.icons={};n.hidden={};n.order=[];commit();draw();refresh()}));
+    host.appendChild(ad)};
+  draw()}
+function drawAdmin(){
+  const H=$('#c-admin');
+  const sec=(id,title,hint)=>`<section><h3>${title}</h3>${hint?`<p class="hint">${hint}</p>`:''}<div id="${id}"></div></section>`;
+  H.className='adm';
+  H.innerHTML=`<div class="langnote">${t('a_lang')} <span class="saved" id="savedTag">${t('saved')}</span></div>
+  <section><h3>${t('a_gen')}</h3>
+    <label>${t('a_name')}<input id="g_name"></label><label>${t('a_short')}<input id="g_short" maxlength="3"></label>
+    <label>${t('a_server')}<input id="g_server"></label><label>${t('a_dc')}<input id="g_dc" dir="ltr"></label><label>${t('a_dcid')}<input id="g_dcid" dir="ltr" placeholder="123456789012345678"></label><p class="hint">${t('a_dcidH')}<br><code dir="ltr" id="ruShow"></code></p>
+    <label>${t('a_tag')}<input id="g_tag"></label><label>${t('a_about')}<textarea id="g_about"></textarea></label></section>`+
+  sec('e_nav',t('a_nav'),t('a_navH'))+sec('e_vis',t('a_vis'),t('a_visH'))+sec('e_blocks',t('a_blocks'),t('a_blocksH'))+sec('e_stats',t('a_stats'))+sec('e_values',t('a_values'))+sec('e_paths',t('a_paths'))+sec('e_rules',t('a_rules'),t('a_ruleH'))+sec('e_sop',t('a_sop'),t('a_sopH'))+sec('e_fto',t('a_fto'))+sec('e_access',t('a_access'))+sec('e_jq',t('a_jq'),t('a_jqH'))+
+  `<section><h3>${t('a_sch')}</h3><p class="hint">${t('a_schH')}</p><div id="e_sch" style="margin-top:12px"></div><label style="margin-top:14px">${t('a_schNote')}<textarea id="schNoteIn" placeholder="${esc(t('a_schNote'))}"></textarea></label></section>`+
+  sec('e_crew',t('a_crew'))+`<section><h3>${t('a_crewNote')}</h3><textarea id="crewNoteIn" placeholder="${esc(t('a_crewNote'))}"></textarea></section>`+sec('e_media',t('a_media'))+sec('e_cred',t('a_cred'))+
+  `<section><h3>${t('a_bg')}</h3><div class="rt"><label class="btn gh sm fbtn" style="display:inline-flex;width:auto;color:var(--tx)">${t('a_bgUp')}<input type="file" accept="image/*" id="bgFile"></label><button class="btn gh sm" id="bgClr">${t('a_bgRm')}</button></div><label style="margin-top:12px">${t('a_dim')}<input type="range" id="bgDim" min="0" max="0.95" step="0.05" style="padding:0"></label>
+    <h3 style="margin-top:18px">${t('a_gal')}</h3><div class="rt" id="galT"></div></section>
+  <section><h3>${t('a_theme')}</h3><p class="hint">${t('a_themeH')}</p><div class="two"><label>${t('thAc')}<input type="color" id="dAc"></label><label>${t('thBg')}<input type="color" id="dBg"></label></div></section>
+  <section><h3>${t('a_sec')}</h3><p class="hint">${t('a_secH')}</p>
+    <label>${t('a_newCode')}<input id="newCode"></label><button class="btn sm" id="setCode">${t('a_setCode')}</button>
+    <label style="flex-direction:row;display:flex;align-items:center;gap:8px;color:var(--tx);margin-top:18px"><input type="checkbox" id="gateOn"> ${t('a_gateOn')}</label>
+    <label>${t('a_gateCode')}<input id="gateCode"></label><button class="btn sm" id="setGate">${t('a_gateSet')}</button></section>
+  <section><h3>${t('a_ex')}</h3><p class="hint">${t('a_exH')}</p><textarea id="ex" dir="ltr" style="min-height:110px"></textarea>
+    <div class="rt" style="margin-top:10px"><button class="btn sm" id="exCopy">${t('a_exCopy')}</button><button class="btn gh sm" id="imp">${t('a_imp')}</button><button class="btn dg sm" id="rst">${t('a_rst')}</button></div></section>`;
+  const bindI=(id,k)=>{const e=$('#'+id);e.value=L(C[k]);e.oninput=()=>{setI(C,k,e.value);commit()}};
+  bindI('g_name','name');bindI('g_tag','tagline');bindI('g_about','about');
+  const bindP=(id,k)=>{const e=$('#'+id);e.value=C[k];e.oninput=()=>{C[k]=e.value;commit()}};bindP('g_short','short');bindP('g_server','server');bindP('g_dc','discord');bindP('g_dcid','dcClientId');{const r=$('#ruShow');if(r)r.textContent=location.origin+location.pathname}
+  edNav($('#e_nav'));edVis($('#e_vis'));edBlocks($('#e_blocks'));
+  listEd($('#e_stats'),C.stats,[{k:'n',l:t('p_num'),t:'p'},{k:'l',l:t('p_lbl'),t:'i'}],()=>({n:'0',l:B('وصف','Label')}));
+  listEd($('#e_values'),C.values,[{k:'t',l:t('p_t'),t:'i'},{k:'d',l:t('p_d'),t:'A'}],()=>({t:B('عنوان','Title'),d:B('وصف','Description')}));
+  listEd($('#e_paths'),C.paths,[{k:'t',l:t('p_t'),t:'i'},{k:'d',l:t('p_d'),t:'i'},{k:'r',l:t('p_ranks'),t:'A'}],()=>({t:B('مسار','Path'),d:B('وصف','Description'),r:B('رتبة 1\nرتبة 2','Rank 1\nRank 2')}));
+  listEd($('#e_rules'),C.rules,[{k:'t',l:t('p_t'),t:'i'},{k:'deg',l:t('p_deg'),t:'s',o:[0,1,2,3,4,5,6,7].map(n=>[String(n),String(n)])},{k:'d',l:t('p_txt'),t:'A'}],()=>({t:B('لائحة جديدة','New regulation'),deg:'0',d:B('نص اللائحة','Regulation text')}));
+  listEd($('#e_sop'),C.sop,[{k:'t',l:t('p_t'),t:'i'},{k:'d',l:t('p_pts'),t:'A'}],()=>({t:B('إجراء جديد','New procedure'),d:B('نقطة 1\nنقطة 2','Point 1\nPoint 2')}));
+  listEd($('#e_fto'),C.fto,[{k:'t',l:t('p_t'),t:'i'},{k:'dur',l:t('p_dur'),t:'i'},{k:'d',l:t('p_d'),t:'A'}],()=>({t:B('مرحلة','Phase'),dur:B('أسبوع','Week'),d:B('وصف','Description')}));
+  listEd($('#e_access'),C.access,[{k:'role',l:t('p_role'),t:'i'},{k:'perms',l:t('p_perms'),t:'A'}],()=>({role:B('دور','Role'),perms:B('صلاحية','Permission')}));
+  if(!C.joinQs)C.joinQs=[];listEd($('#e_jq'),C.joinQs,[{k:'t',l:t('p_q'),t:'i'},{k:'k',l:t('p_kind'),t:'s',o:[['text',t('qt_text')],['long',t('qt_long')],['number',t('qt_num')],['choice',t('qt_choice')]]},{k:'o',l:t('p_opts'),t:'A'},{k:'req',l:t('p_req'),t:'s',o:[['1',t('q_yes')],['0',t('q_no')]]}],()=>({t:B('سؤال جديد','New question'),k:'text',o:B('',''),req:'1'}));
+  listEd($('#e_sch'),C.schedule.rows,[{k:'name',l:t('p_nm'),t:'p'},{k:'rank',l:t('p_rank'),t:'i'},{k:'code',l:t('p_code'),t:'p'},{k:'st',l:t('p_st'),t:'s',o:[['on',t('on')],['off',t('off')],['lv',t('lv')]]},{k:'ins',l:t('p_ins'),t:'p'},{k:'insUrl',l:t('p_insUrl'),t:'p'},{k:'insFile',l:t('a_img'),t:'f'},{k:'insFile',l:t('a_bgRm'),t:'c'}],()=>({name:'Name',rank:B('عضو','Member'),code:'PSF-000',st:'on',ins:'',insUrl:'',insFile:''}));
+  const sn=$('#schNoteIn');sn.value=L(C.schedule.note||'');sn.oninput=()=>{setI(C.schedule,'note',sn.value);commit()};
+  listEd($('#e_crew'),C.crew,[{k:'name',l:t('p_nm'),t:'p'},{k:'rank',l:t('p_rank'),t:'i'},{k:'code',l:t('p_code'),t:'p'},{k:'st',l:t('p_st'),t:'s',o:[['on',t('on')],['off',t('off')],['lv',t('lv')]]},{k:'img',l:t('a_img'),t:'f'},{k:'img',l:t('a_bgRm'),t:'c'},{k:'ins',l:t('p_ins'),t:'p'},{k:'joined',l:t('p_joined'),t:'p'},{k:'did',l:t('p_did'),t:'p'},{k:'warns',l:t('p_warns'),t:'P'},{k:'notes',l:t('p_notes'),t:'P'}],()=>({name:'Name',rank:B('عضو','Member'),code:'PSF-000',st:'on',img:'',ins:'',joined:'',did:'',warns:'',notes:''}));
+  const cn=$('#crewNoteIn');cn.value=L(C.crewNote||'');cn.oninput=()=>{setI(C,'crewNote',cn.value);commit()};
+  listEd($('#e_media'),C.media,[{k:'t',l:t('p_t'),t:'i'},{k:'kind',l:t('p_kind'),t:'s',o:[['stream',t('p_stream')],['archive',t('p_arch')]]},{k:'url',l:t('p_url'),t:'p'},{k:'img',l:t('a_img'),t:'f'}],()=>({t:B('عنوان','Title'),kind:'stream',url:'',img:''}));
+  listEd($('#e_cred'),C.credits,[{k:'name',l:t('p_nm'),t:'p'},{k:'role',l:t('p_role'),t:'i'}],()=>({name:'Name',role:B('دور','Role')}));
+  $('#bgFile').onchange=e=>{const f=e.target.files[0];if(f)readImg(f,1920,u=>{C.bg.img=u;commit()})};
+  $('#bgClr').onclick=()=>{C.bg.img='';commit()};
+  $('#bgDim').value=C.bg.dim;$('#bgDim').oninput=e=>{C.bg.dim=+e.target.value;commit()};
+  $('#galT').innerHTML=[0,1,2,3].map(i=>`<label class="btn gh sm fbtn" style="display:inline-flex;width:auto;color:var(--tx)">${C.gallery[i]?'✓ ':''}${t('a_img')} ${i+1}<input type="file" accept="image/*" data-g="${i}"></label>`).join('');
+  $$('#galT input').forEach(inp=>inp.onchange=e=>{const f=e.target.files[0];if(f)readImg(f,1000,u=>{C.gallery[+inp.dataset.g]=u;commit();drawAdmin()})});
+  $('#dAc').value=C.theme.accent;$('#dBg').value=C.theme.bg;
+  $('#dAc').oninput=e=>{C.theme.accent=e.target.value;save()};$('#dBg').oninput=e=>{C.theme.bg=e.target.value;save()};
+  $('#setCode').onclick=async()=>{const v=$('#newCode').value;if(v.length<4){alert(t('a_codeShort'));return}C.adminHash=await sha(v);save();$('#newCode').value='';alert(t('a_codeDone'))};
+  $('#gateOn').checked=C.gate.on;$('#gateOn').onchange=e=>{C.gate.on=e.target.checked;save()};
+  $('#setGate').onclick=async()=>{const v=$('#gateCode').value;if(v.length<4){alert(t('a_codeShort'));return}C.gate.hash=await sha(v);save();$('#gateCode').value='';alert(t('a_codeDone'))};
+  $('#exCopy').onclick=async()=>{$('#ex').value=JSON.stringify(C);try{await navigator.clipboard.writeText($('#ex').value);$('#exCopy').textContent=t('copied')}catch(_){$('#ex').select()}};
+  $('#imp').onclick=()=>{try{C=Object.assign(clone(CONFIG),JSON.parse($('#ex').value));commit();drawAdmin()}catch(_){alert(t('a_bad'))}};
+  $('#rst').onclick=()=>{if(confirm(t('a_rstQ'))){try{localStorage.removeItem(KEY)}catch(_){}C=clone(CONFIG);renderAll();drawAdmin()}};
+}
+/* ---- Discord login (client-side OAuth, identify only) ---- */
+const RET=location.hash.startsWith('#access_token=')||location.hash.startsWith('#error=')?location.hash.slice(1):(/[?&]error=/.test(location.search)?location.search.slice(1):null);
+if(RET)history.replaceState(null,'',location.pathname+location.search);
+const DKEY='portal_discord';let DU=null;try{DU=JSON.parse(localStorage.getItem(DKEY)||'null')}catch(_){}
+document.body.insertAdjacentHTML('beforeend','<div id="dlChip"></div><div id="dlToast"></div>');
+function dlToast(m){const e=$('#dlToast');e.textContent=m;e.style.display='block';clearTimeout(dlToast.t);dlToast.t=setTimeout(()=>e.style.display='none',4500)}
+function dlLabel(){const b=$('#dlBtn'),c=$('#dlChip');if(!b)return;
+  b.innerHTML=DU?`<img src="${esc(DU.av)}" alt="" style="width:20px;height:20px;border-radius:50%"> ${esc(DU.name)} · ${esc(t('dl_out'))}`:'🎮 '+esc(t('dl_in'));
+  if(c){if(DU){c.innerHTML=`<img src="${esc(DU.av)}" alt=""><span>${esc(DU.name)}</span>`;c.style.display='flex'}else c.style.display='none'}}
+function fillJoin(){const j=$('#j2');if(j&&DU&&!j.value)j.value=DU.user}
+const _dj=drawJoin;drawJoin=function(){_dj();fillJoin()};
+async function dlFinish(h){const p=new URLSearchParams(h);let why='';
+  try{const tk=p.get('access_token');if(!tk){why=p.get('error_description')||p.get('error')||'no token';throw 0}
+    let ok=false;try{ok=[sessionStorage.getItem('dl_state'),localStorage.getItem('dl_state')].includes(p.get('state'))}catch(_){}
+    if(!ok){why='state mismatch';throw 0}
+    const r=await fetch('https://discord.com/api/users/@me',{headers:{Authorization:'Bearer '+tk}});if(!r.ok){why='HTTP '+r.status;throw 0}
+    const u=await r.json();
+    DU={id:u.id,name:u.global_name||u.username,user:u.username,av:u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`:'https://cdn.discordapp.com/embed/avatars/0.png'};
+    localStorage.setItem(DKEY,JSON.stringify(DU));dlToast('✓ '+DU.name)}
+  catch(e){if(!why)why=(e&&e.message)||'network';if(p.get('error')!=='access_denied')alert(t('dl_err')+'\n('+why+')')}
+  dlLabel();drawJoin();go(sessionStorage.getItem('dl_back')||'hub')}
+$('#dlBtn').onclick=()=>{
+  if(DU){DU=null;try{localStorage.removeItem(DKEY)}catch(_){}dlLabel();drawJoin();return}
+  const id=(C.dcClientId||'').trim();if(!id){alert(t('dl_noid'));return}
+  const st=[...crypto.getRandomValues(new Uint32Array(4))].join('-');
+  try{sessionStorage.setItem('dl_state',st);sessionStorage.setItem('dl_back',location.hash.slice(1)||'hub');localStorage.setItem('dl_state',st)}catch(_){}
+  location.href='https://discord.com/oauth2/authorize?client_id='+encodeURIComponent(id)+'&response_type=token&scope=identify&state='+st+'&redirect_uri='+encodeURIComponent(location.origin+location.pathname)};
+/* ---- start ---- */
+applyTheme();renderAll();tick();
+try{if(sessionStorage.getItem('adm')){admin=true;applyLang();drawAdmin();drawNav();drawBlocks();drawCrew();drawJoin()}}catch(_){}
+gateCheck();
+if(RET)dlFinish(RET);
+setTimeout(()=>{$('#boot').classList.add('off');go(location.hash.slice(1)||'hub')},1700);
+</script>
+
+
+<style id="mecss">
+#meBtn{position:fixed;bottom:16px;inset-inline-end:16px;z-index:9000;border:1px solid var(--ac);background:var(--acd,rgba(216,178,110,.14));color:var(--ac);border-radius:14px;padding:11px 20px;font:600 .95rem var(--fd);cursor:pointer;backdrop-filter:blur(10px)}
+#me{position:fixed;inset:0;z-index:9500;background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:blur(10px);overflow:auto;padding:16px}
+#me[hidden]{display:none}
+#meBox{max-width:760px;margin:0 auto;padding-bottom:60px}
+#me .mh{display:flex;align-items:center;gap:10px;padding:10px 0 16px;border-bottom:1px solid var(--ln);margin-bottom:16px}
+#me .sp{flex:1}
+#me .st{font-size:.78rem;color:var(--ac);border:1px solid var(--ln);border-radius:999px;padding:2px 10px;white-space:nowrap}
+#me .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px}
+#me .tabs button{flex:none}
+#me button{border:1px solid var(--ln2,var(--ln));background:none;border-radius:12px;padding:8px 14px;cursor:pointer;font:inherit;color:var(--tx)}
+#me button:hover,#me button.on{border-color:var(--ac);color:var(--ac)}
+#me button.pri{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+#me input,#me textarea,#me select{width:100%;background:var(--s1,rgba(255,255,255,.04));border:1px solid var(--ln);border-radius:12px;padding:10px 12px;color:var(--tx);font:inherit;margin-bottom:10px}
+#me input:focus,#me textarea:focus,#me select:focus{outline:2px solid var(--ac);outline-offset:1px}
+#me form,#me article,#me .card{border:1px solid var(--ln);border-radius:16px;padding:16px;margin-bottom:12px;background:var(--card,rgba(255,255,255,.03))}
+#me article header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:4px}
+#me small,#me .demo{color:var(--mu);font-size:.85rem}
+#me article p{white-space:pre-wrap;margin:8px 0;overflow-wrap:anywhere}
+#me .r{display:flex;gap:10px;flex-wrap:wrap}
+#me .r>*{flex:1;min-width:120px}
+#me label{display:block;color:var(--mu);font-size:.85rem}
+#me .rv{color:var(--wr,#E0A03C);font-size:.9rem}
+#me .demo{border:1px dashed var(--ln);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+#me .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}
+#me .tiles div{border:1px solid var(--ln);border-radius:14px;padding:12px;background:var(--card,rgba(255,255,255,.03))}
+#me .tiles b{display:block;font:700 1.6rem var(--fd);color:var(--ac)}
+#me .tiles span{color:var(--mu);font-size:.82rem}
+#me .tw{overflow-x:auto;margin-top:8px}
+#me table{width:100%;border-collapse:collapse;font-size:.92rem}
+#me th,#me td{text-align:start;padding:8px 10px;border-bottom:1px solid var(--ln)}
+#me th{color:var(--mu);font-weight:500}
+</style>
+<button id="meBtn" type="button">حسابي</button>
+<div id="me" hidden><div id="meBox"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+const URL_='',KEY_='';/* ← ضع هنا رابط مشروع Supabase والمفتاح العام (anon) */
+const R={trainee:'متدرب',member:'عضو',officer:'ضابط',command:'قيادة'};
+const K={report:'التقارير',case:'القضايا',leave:'الإجازات',note:'ملاحظاتي',review:'المراجعة',members:'الأعضاء',att:'الحضور',admin:'الإدارة'}
+const AT={'':'غير مسجل',present:'حاضر',late:'متأخر',absent:'غائب',excused:'معذور'};;
+const KS={report:'تقرير',case:'قضية',leave:'طلب إجازة',note:'ملاحظة'};
+const S={pending:'قيد المراجعة',submitted:'مرفوع',open:'مفتوحة',private:'خاصة',approved:'موافق عليها',rejected:'مرفوضة',reviewed:'تمت المراجعة',closed:'مغلقة'};
+const E=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const em=u=>u+'@users.psf-portal.com';
+const er=e=>{const m=(e&&e.message)||'';return /Invalid login/i.test(m)?'اسم المستخدم أو كلمة المرور غلط.':/already registered/i.test(m)?'هذا الاسم مستخدم.':/at least|password/i.test(m)?'كلمة المرور لازم 8 أحرف على الأقل.':m||'صار خطأ، جرّب مرة ثانية.'};
+let sb=null;try{if(URL_&&KEY_&&window.supabase)sb=window.supabase.createClient(URL_,KEY_)}catch(_){}
+let mem={e:[{id:900,user_id:'a',kind:'leave',title:'إجازة عائلية',body:'سفر مع العائلة.',status:'pending',start_date:'2026-12-01',end_date:'2026-12-05',created_at:new Date().toISOString()}],m:[{id:'d',username:'demo',rank:'command',status:'active'},{id:'a',username:'alpha',rank:'member',status:'active'},{id:'e',username:'echo',rank:'trainee',status:'pending'}]},user=false,n=1000;
+try{const s=JSON.parse(localStorage.getItem('psf_demo'));if(s){mem=s;n=Math.max(1000,...mem.e.map(x=>x.id+1))}}catch(_){}
+const sv=()=>{try{localStorage.setItem('psf_demo',JSON.stringify(mem))}catch(_){}};
+const L={
+ async me(){return user?mem.m[0]:null},
+ async login(){user=true},
+ async signup(){throw new Error('التسجيل الجديد يشتغل بعد ربط Supabase.')},
+ async out(){user=false},
+ async list(f){return mem.e.filter(x=>(!f.kind||x.kind===f.kind)&&(!f.uid||x.user_id===f.uid)&&(!f.not||x.user_id!==f.not)&&(!f.st||f.st.includes(x.status))).map(x=>({...x,profiles:mem.m.find(m=>m.id===x.user_id)})).reverse()},
+ async add(r){const st={leave:'pending',case:'open',note:'private'}[r.kind]||'submitted';mem.e.push({...r,id:n++,user_id:'d',status:st,created_at:new Date().toISOString()});sv()},
+ async upd(id,p){Object.assign(mem.e.find(x=>x.id===id),p);sv()},
+ async del(id){mem.e=mem.e.filter(x=>x.id!==id);sv()},
+ async members(){return mem.m},
+ async setM(id,rk,st){Object.assign(mem.m.find(m=>m.id===id),{rank:rk,status:st});sv()}};
+mem.att=mem.att||[{id:1,title:'تدريب جماعي',date:'2026-11-14',kind:'تدريب',marks:{a:'present',e:'absent',d:'present'}},{id:2,title:'دورية',date:'2026-11-18',kind:'دورية',marks:{a:'late',e:'present',d:'present'}}];
+mem.log=mem.log||[{t:new Date().toISOString(),who:'demo',act:'فتح البوابة'}];
+if(!mem.e.some(x=>x.id===901))mem.e.push({id:901,user_id:'a',kind:'note',title:'ملاحظة تدريب',body:'أحتاج وقت أكثر على الاتصال اللاسلكي.',status:'private',created_at:new Date().toISOString()});
+const lg=a=>{mem.log.unshift({t:new Date().toISOString(),who:'demo',act:a});mem.log.length=Math.min(mem.log.length,60)};
+const wrap=(k,f)=>{const o=L[k];L[k]=async(...a)=>{const r=await o(...a);lg(f(...a));sv();return r}};
+wrap('add',r=>'أضاف '+KS[r.kind]+': '+r.title);wrap('upd',(id,p)=>'حدّث السجل #'+id+' إلى '+(S[p.status]||p.status));wrap('del',id=>'حذف السجل #'+id);wrap('setM',()=>'عدّل صلاحيات عضو');
+Object.assign(L,{all:async()=>mem.e.map(x=>({...x,profiles:mem.m.find(m=>m.id===x.user_id)})).reverse(),att:async()=>mem.att,addAtt:async(t,d,k)=>{mem.att.push({id:Date.now(),title:t,date:d,kind:k,marks:{}});lg('فتح جلسة حضور: '+t);sv()},mark:async(id,u,v)=>{mem.att.find(x=>x.id===id).marks[u]=v;lg('سجّل حضور');sv()},log:async()=>mem.log});
+const ok=async p=>{const r=await p;if(r.error)throw r.error;return r.data};
+const A=sb?{
+ async me(){const s=(await sb.auth.getSession()).data.session;if(!s)return null;return ok(sb.from('profiles').select('*').eq('id',s.user.id).single())},
+ login:async(u,p)=>{const r=await sb.auth.signInWithPassword({email:em(u),password:p});if(r.error)throw r.error},
+ signup:async(u,p)=>{const r=await sb.auth.signUp({email:em(u),password:p,options:{data:{username:u}}});if(r.error)throw r.error},
+ out:()=>sb.auth.signOut(),
+ list(f){let q=sb.from('entries').select('*,profiles(username,display)').order('created_at',{ascending:false});if(f.kind)q=q.eq('kind',f.kind);if(f.uid)q=q.eq('user_id',f.uid);if(f.not)q=q.neq('user_id',f.not);if(f.st)q=q.in('status',f.st);return ok(q)},
+ add:r=>ok(sb.from('entries').insert(r)),
+ upd:(id,p)=>ok(sb.from('entries').update(p).eq('id',id)),
+ del:id=>ok(sb.from('entries').delete().eq('id',id)),
+ members:()=>ok(sb.from('profiles').select('*').order('created_at')),
+ setM:(id,rk,st)=>ok(sb.rpc('set_member',{uid:id,new_rank:rk,new_status:st}))
+}:L;
+const root=document.getElementById('me'),box=document.getElementById('meBox');
+let me=null,tab='report',rows=[],msg='',ax={},fk='';
+const staff=()=>me&&(me.rank==='officer'||me.rank==='command');
+const opts=(o,v)=>Object.keys(o).map(k=>`<option value="${k}"${k===v?' selected':''}>${o[k]}</option>`).join('');
+const day=d=>d?new Date(d).toLocaleDateString('ar'):'';
+async function attLoad(){ax={mem:(await A.members()).filter(m=>m.status==='active')};return A.att()}
+async function adm(){ax={att:await A.att(),log:await A.log(),mem:(await A.members()).filter(m=>m.status==='active')};return A.all()}
+async function load(){try{rows=tab==='att'?await attLoad():tab==='admin'?await adm():tab==='members'?await A.members():tab==='review'?(await A.list({not:me.id,st:['pending','submitted','open']})).filter(x=>x.kind!=='note'):await A.list({kind:tab,uid:me.id})}catch(e){rows=[];msg=er(e)}}
+async function boot(){try{me=await A.me()}catch(_){me=null}msg='';if(me&&me.status==='active')await load();draw()}
+async function go(t){tab=t;msg='';await load();draw()}
+function card(r){const who=r.profiles?E(r.profiles.display||r.profiles.username):'';
+ const mine=tab!=='review'&&tab!=='admin';const canDel=mine&&(r.kind==='note'||['pending','submitted','open'].includes(r.status));
+ let h=`<article><header><b>${E(r.title)}</b><span class="st">${S[r.status]||E(r.status)}</span></header><small>${tab==='review'||tab==='admin'?who+' | '+KS[r.kind]+' | ':''}${day(r.created_at)}${r.kind==='leave'?' | من '+E(r.start_date)+' إلى '+E(r.end_date):''}</small>${r.body?`<p>${E(r.body)}</p>`:''}${r.review_note?`<p class="rv">ملاحظة المراجع: ${E(r.review_note)}</p>`:''}`;
+ if(tab==='review'){const ok1=r.kind==='leave'?['approved','موافقة']:r.kind==='case'?['closed','إغلاق']:['reviewed','تمت المراجعة'];
+  h+=`<input data-note="${r.id}" maxlength="500" placeholder="ملاحظة للعضو (اختياري)"><div class="r"><button class="pri" data-act="${r.id}|${ok1[0]}">${ok1[1]}</button><button data-act="${r.id}|rejected">رفض</button></div>`}
+ if(canDel)h+=`<button data-del="${r.id}">حذف</button>`;
+ return h+'</article>'}
+function draw(){
+ let h=sb?'':'<div class="demo">وضع تجربة: البيانات محفوظة بهذا المتصفح فقط، وتدخل كقيادة. اربط Supabase ليشتغل التسجيل والخصوصية بشكل حقيقي.</div>';
+ if(!me){box.innerHTML=h+`<div class="mh"><b>حسابي</b><span class="sp"></span><button data-x="close">إغلاق</button></div><form id="lg"><input name="u" placeholder="اسم المستخدم (إنجليزي)" pattern="[A-Za-z0-9_]{3,20}" required autocomplete="username"><input name="p" type="password" placeholder="كلمة المرور (8 أحرف على الأقل)" minlength="8" required autocomplete="current-password"><div class="r"><button class="pri" data-m="in">دخول</button><button data-m="up">حساب جديد</button></div><p class="rv">${E(msg)}</p></form>`;return}
+ h+=`<div class="mh"><b>${E(me.display||me.username)}</b><span class="st">${R[me.rank]}</span><span class="sp"></span><button data-x="out">خروج</button><button data-x="close">إغلاق</button></div>`;
+ if(me.status!=='active'){box.innerHTML=h+`<div class="card"><p>${me.status==='pending'?'حسابك بانتظار موافقة القيادة.':'حسابك موقوف. تواصل مع القيادة.'}</p></div>`;return}
+ const tabs=['report','case','leave','note'].concat(staff()?['review']:[]).concat(A.att?['att']:[]).concat(me.rank==='command'?['members']:[]).concat(A.all&&me.rank==='command'?['admin']:[]);
+ h+=`<div class="tabs">${tabs.map(t=>`<button data-tab="${t}"${t===tab?' class="on"':''}>${K[t]}</button>`).join('')}</div>`;
+ if(msg)h+=`<p class="rv">${E(msg)}</p>`;
+ if(tab==='att'){h+=staff()?`<form id="fa"><input name="title" required maxlength="80" placeholder="اسم الجلسة"><div class="r"><input type="date" name="date" required><select name="kind"><option>تدريب</option><option>دورية</option><option>اجتماع</option></select></div><button class="pri">فتح جلسة حضور</button></form>`:'';
+  h+=rows.length?rows.slice().reverse().map(s=>`<article><header><b>${E(s.title)}</b><span class="st">${E(s.kind)}</span></header><small>${E(s.date)}</small>`+(staff()?ax.mem.map(m=>`<div class="r"><span>${E(m.display||m.username)}</span><select data-mk="${s.id}|${m.id}">${opts(AT,s.marks[m.id]||'')}</select></div>`).join(''):`<p>حالتك: <b>${AT[s.marks[me.id]||'']}</b></p>`)+'</article>').join(''):'<p><small>ما في جلسات لسه.</small></p>'}
+ else if(tab==='admin'){const c=k=>rows.filter(x=>x.kind===k).length,op=rows.filter(x=>['pending','submitted','open'].includes(x.status)).length;let tot=0,pr=0;
+  const per=ax.mem.map(m=>{let p=0,l=0,a=0;ax.att.forEach(s=>{const v=s.marks[m.id];if(v==='present')p++;else if(v==='late')l++;else if(v==='absent')a++});const n=p+l+a;tot+=n;pr+=p+l;return `<tr><td>${E(m.display||m.username)}</td><td>${p}</td><td>${l}</td><td>${a}</td><td>${n?Math.round((p+l)/n*100)+'%':'-'}</td></tr>`}).join('');
+  h+=`<div class="tiles">`+[['الأعضاء',ax.mem.length],['التقارير',c('report')],['القضايا',c('case')],['الإجازات',c('leave')],['الملاحظات',c('note')],['بانتظار المراجعة',op],['نسبة الحضور',tot?Math.round(pr/tot*100)+'%':'-']].map(x=>`<div><b>${x[1]}</b><span>${x[0]}</span></div>`).join('')+`</div>`;
+  h+=`<article><b>الحضور لكل عضو</b><div class="tw"><table><tr><th>العضو</th><th>حاضر</th><th>متأخر</th><th>غائب</th><th>النسبة</th></tr>${per}</table></div></article>`;
+  h+=`<select id="af"><option value="">كل السجلات</option>${opts(KS,fk)}</select>`+rows.filter(x=>!fk||x.kind===fk).map(card).join('');
+  h+=`<article><b>آخر النشاط</b>${ax.log.slice(0,25).map(l=>`<p><small>${day(l.t)}</small> ${E(l.who)}: ${E(l.act)}</p>`).join('')}</article>`}
+ else if(tab==='members')h+=rows.map(r=>`<article><header><b>${E(r.display||r.username)}</b><span class="st">${E(r.username)}</span></header><div class="r"><select data-rk>${opts(R,r.rank)}</select><select data-sts>${opts({pending:'بانتظار',active:'فعّال',suspended:'موقوف'},r.status)}</select><button class="pri" data-save="${r.id}">حفظ</button></div></article>`).join('');
+ else{
+  if(tab!=='review')h+=`<form id="f"><input name="title" maxlength="120" required placeholder="العنوان"><textarea name="body" rows="4" maxlength="8000" placeholder="${tab==='note'?(sb?'ملاحظتك (خاصة فيك، ما أحد يشوفها)':'ملاحظتك (تظهر للإدارة)'):'التفاصيل'}"></textarea>${tab==='leave'?'<div class="r"><label>من<input type="date" name="start_date" required></label><label>إلى<input type="date" name="end_date" required></label></div>':''}<button class="pri">${tab==='leave'?'قدّم الطلب':'إضافة'}</button></form>`;
+  h+=rows.length?rows.map(card).join(''):'<p><small>ما في شي هون لسه.</small></p>'}
+ box.innerHTML=h}
+box.onclick=async e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+ try{
+  if(d.tab)return go(d.tab);
+  if(d.x==='close'){root.hidden=true;return}
+  if(d.x==='out'){await A.out();me=null;msg='';return draw()}
+  if(d.del){if(!d.arm){t.dataset.arm=1;t.textContent='تأكيد الحذف';return}await A.del(+d.del);return go(tab)}
+  if(d.act){const p=d.act.split('|'),i=box.querySelector(`[data-note="${p[0]}"]`);await A.upd(+p[0],{status:p[1],review_note:(i&&i.value.trim())||null});return go(tab)}
+  if(d.save){const a=t.closest('article');await A.setM(d.save,a.querySelector('[data-rk]').value,a.querySelector('[data-sts]').value);return go(tab)}
+ }catch(err){msg=er(err);draw()}};
+box.onsubmit=async e=>{e.preventDefault();const f=e.target,d=Object.fromEntries(new FormData(f));
+ try{
+  if(f.id==='fa'){await A.addAtt(d.title.trim(),d.date,d.kind);return go(tab)}if(f.id==='lg'){const u=d.u.toLowerCase();if(e.submitter&&e.submitter.dataset.m==='up')await A.signup(u,d.p);else await A.login(u,d.p);return boot()}
+  await A.add({kind:tab,title:d.title.trim(),body:(d.body||'').trim(),start_date:d.start_date||null,end_date:d.end_date||null});await go(tab)
+ }catch(err){msg=er(err);draw()}};
+box.onchange=async e=>{const t=e.target;if(t.id==='af'){fk=t.value;return draw()}const m=t.dataset&&t.dataset.mk;if(!m)return;const p=m.split('|');try{await A.mark(+p[0],p[1],t.value)}catch(err){msg=er(err);draw()}};
+document.getElementById('meBtn').onclick=()=>{root.hidden=false;boot()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!root.hidden)root.hidden=true});
+})();
+</script>
+<style id="ixcss">
+#intro{position:fixed;inset:0;z-index:99999;background:radial-gradient(900px 520px at 88% -8%,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%),radial-gradient(700px 500px at 0% 105%,color-mix(in srgb,var(--ac) 9%,transparent),transparent 70%),var(--bg);color:var(--tx);font-family:var(--fb);overflow:hidden;transition:opacity .6s;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+#intro.out{opacity:0;pointer-events:none}
+#intro *{box-sizing:border-box}
+#intro canvas{position:absolute;inset:0;width:100%;height:100%}
+#intro .ixg{position:absolute;inset:0;background:linear-gradient(var(--ln) 1px,transparent 1px) 0 0/100% 56px;opacity:.14}
+#intro .ixs{position:absolute;inset-inline:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--ac),transparent);opacity:.5;animation:ixsc 9s linear infinite}
+@keyframes ixsc{from{transform:translateY(-10vh)}to{transform:translateY(110vh)}}
+#intro .ixb{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);inset-inline:20px;display:flex;gap:6px;z-index:5}
+#intro .ixb i{flex:1;height:3px;border-radius:3px;background:color-mix(in srgb,var(--tx) 15%,transparent);overflow:hidden}
+#intro .ixb b{display:block;height:100%;width:0;background:var(--ac)}
+#intro .ixb i.done b{width:100%}
+#intro .ixb i.on b{animation:ixfill var(--d,5s) linear forwards}
+#intro.paused .ixb i.on b{animation-play-state:paused}
+@keyframes ixfill{to{width:100%}}
+#intro .ixsc{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:84px clamp(24px,8vw,120px) 110px;opacity:0;visibility:hidden;transition:opacity .7s,visibility .7s}
+#intro .ixsc.on{opacity:1;visibility:visible}
+#intro .ixsc>*{transform:translateY(16px);transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+#intro .ixsc.on>*{transform:none}
+#intro .ixsc.on>*:nth-child(2){transition-delay:.12s}
+#intro .ixsc.on>*:nth-child(3){transition-delay:.24s}
+#intro .ixbig{position:relative;display:inline-block;align-self:flex-start;font:700 clamp(6rem,34vw,17rem)/.9 var(--fd);letter-spacing:.02em;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 55%,#fff),var(--ac) 55%,color-mix(in srgb,var(--ac) 45%,#000));-webkit-background-clip:text;background-clip:text;color:transparent}
+#intro .ixbig.sm{font-size:clamp(3rem,15vw,8rem);line-height:1.1}
+#intro .ixbig::after{content:"";position:absolute;inset:6% -2%;background:var(--ac);transform-origin:right;transition:transform 1.1s cubic-bezier(.7,0,.2,1) .5s}
+#intro .ixsc.on .ixbig::after{transform:scaleX(0)}
+#intro .ixtag{font:300 clamp(1.2rem,3.4vw,2rem)/1.5 var(--fd);margin-top:26px;max-width:24ch}
+#intro .ixmu{color:var(--mu);font-size:clamp(1rem,2.3vw,1.35rem);margin-top:14px;max-width:40ch;line-height:1.9}
+#intro .ixh{font:700 clamp(2rem,6vw,4rem)/1.2 var(--fd);max-width:16ch}
+#intro .ixst{display:flex;flex-wrap:wrap;gap:18px clamp(24px,5vw,56px);margin-top:34px}
+#intro .ixst b{display:block;font:700 clamp(2rem,6vw,3.6rem) var(--fd);color:var(--ac)}
+#intro .ixst span{color:var(--mu);font-size:.95rem}
+#intro .ixr{display:grid;margin-top:26px;max-width:560px}
+#intro .ixr div{padding:16px 0;border-bottom:1px solid var(--ln)}
+#intro .ixr b{display:block;font:500 clamp(1.3rem,3.2vw,1.9rem) var(--fd);color:var(--ac)}
+#intro .ixr span{color:var(--mu)}
+#intro .ixt{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:clamp(16px,4vw,48px);margin-top:28px;max-width:640px}
+#intro .ixt h4{font:500 1.2rem var(--fd);color:var(--ac);padding-bottom:10px;border-bottom:1px solid var(--ln);margin-bottom:12px}
+#intro .ixt p{padding:6px 0}
+#intro .ixp{display:grid;margin-top:26px;max-width:560px;border-inline-start:2px solid var(--ln)}
+#intro .ixp div{padding:10px 20px;position:relative}
+#intro .ixp div::before{content:"";position:absolute;inset-inline-start:-6px;top:20px;width:10px;height:10px;border-radius:50%;background:var(--ac)}
+#intro .ixp b{font:500 1.35rem var(--fd)}
+#intro .ixp span{color:var(--mu);margin-inline-start:12px}
+#intro .ixcta{display:inline-block;margin-top:28px;align-self:flex-start;background:var(--ac);color:var(--bg);font:700 1.1rem var(--fd);padding:14px 34px;border-radius:14px;text-decoration:none;border:0;cursor:pointer;box-shadow:0 12px 36px -12px var(--ac)}
+#intro .ixcta.alt{background:none;color:var(--ac);border:1px solid var(--ln);box-shadow:none;margin-top:12px}
+#intro .ixc{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);inset-inline:20px;display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:6}
+#intro .ixc div{display:flex;gap:10px}
+#intro .ixbtn{width:46px;height:46px;border-radius:14px;border:1px solid var(--ln);background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:blur(10px);color:var(--tx);cursor:pointer;display:grid;place-items:center;transition:border-color .2s,background .2s}
+#intro .ixbtn:hover,#intro .ixskip:hover{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent)}
+#intro .ixbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#intro .ixskip{color:var(--tx);font:400 .9rem var(--fb);padding:0 18px;height:46px;border-radius:14px;border:1px solid var(--ln);background:color-mix(in srgb,var(--bg) 65%,transparent);cursor:pointer}
+#intro button:focus-visible,#intro a:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){#intro .ixs{animation:none}#intro .ixsc,#intro .ixsc>*,#intro .ixbig::after{transition:none}}
+</style>
+<div id="intro" role="dialog" aria-label="Intro"></div>
+<script>
+(function(){
+const root=document.getElementById('intro');if(!root)return;
+let D=null,L='ar';try{D=C}catch(_){}try{L=lang==='en'?'en':'ar'}catch(_){}
+if(!D){root.remove();return}
+const ar=L==='ar';root.dir=ar?'rtl':'ltr';
+const T=ar?{about:'من نحن',vals:'اللي بيحكمنا',paths:'مسارين، وتكبر معنا',fto:'التدريب على ثلاث مراحل',join:'قدّم وانضم لنا',enter:'دخول الموقع',skip:'تخطي',dc:'سيرفر الديسكورد',aff:'فرقة تابعة لـ CIA على سيرفر',pause:'إيقاف مؤقت',prev:'السابق',next:'التالي',fs:'ملء الشاشة',sep:'، '}
+:{about:'Who we are',vals:'What we stand for',paths:'Two paths, grow with us',fto:'Three-stage training',join:'Apply and join us',enter:'Enter site',skip:'Skip',dc:'Discord server',aff:'A CIA-affiliated unit on',pause:'Pause',prev:'Previous',next:'Next',fs:'Fullscreen',sep:', '};
+const g=o=>o&&typeof o==='object'?(o[L]||o.ar||''):(o==null?'':o);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const lines=s=>g(s).split('\n').filter(Boolean);
+const nm=esc(g(D.name)||'PSF');
+const sc=[];
+sc.push(`<div class="ixbig${nm.length>6?' sm':''}">${nm}</div><p class="ixtag">${esc(g(D.tagline))}</p><p class="ixmu">${T.aff} ${esc(D.server||'')}</p>`);
+sc.push(`<div class="ixh">${T.about}</div><p class="ixmu">${esc(g(D.about))}</p><div class="ixst">${(D.stats||[]).map(s=>`<div><b>${esc(s.n)}</b><span>${esc(g(s.l))}</span></div>`).join('')}</div>`);
+if((D.values||[]).length)sc.push(`<div class="ixh">${T.vals}</div><div class="ixr">${D.values.map(v=>`<div><b>${esc(g(v.t))}</b><span>${esc(g(v.d))}</span></div>`).join('')}</div>`);
+if((D.paths||[]).length)sc.push(`<div class="ixh">${T.paths}</div><div class="ixt">${D.paths.map(p=>`<div><h4>${esc(g(p.t))}</h4>${lines(p.r).map(r=>`<p>${esc(r)}</p>`).join('')}</div>`).join('')}</div>`);
+if((D.fto||[]).length)sc.push(`<div class="ixh">${T.fto}</div><div class="ixp">${D.fto.map(f=>`<div><b>${esc(g(f.t))}</b><span>${esc(g(f.dur))}</span></div>`).join('')}</div>`);
+const j=(D.sop&&D.sop[0])?lines(D.sop[0].d).join(T.sep):'';
+const dc=D.discord&&D.discord!=='#'?`<a class="ixcta alt" href="${esc(D.discord)}" target="_blank" rel="noopener">${T.dc}</a>`:'';
+sc.push(`<div class="ixh">${T.join}</div>${j?`<p class="ixmu">${esc(j)}</p>`:''}<button class="ixcta" id="ixEnter" type="button">${T.enter}</button>${dc}`);
+const ic=d=>`<svg viewBox="0 0 24 24">${d}</svg>`;
+root.innerHTML=`<canvas id="ixfx"></canvas><div class="ixg"></div><div class="ixs"></div><div class="ixb"></div>${sc.map(h=>`<section class="ixsc">${h}</section>`).join('')}<div class="ixc"><div><button class="ixbtn" id="ixPp" type="button" aria-label="${T.pause}">${ic('<path d="M8 5v14M16 5v14"/>')}</button><button class="ixbtn" id="ixPv" type="button" aria-label="${T.prev}">${ic(ar?'<path d="M9 6l6 6-6 6"/>':'<path d="M15 6l-6 6 6 6"/>')}</button><button class="ixbtn" id="ixNx" type="button" aria-label="${T.next}">${ic(ar?'<path d="M15 6l-6 6 6 6"/>':'<path d="M9 6l6 6-6 6"/>')}</button></div><button class="ixskip" id="ixSkip" type="button">${T.skip}</button><button class="ixbtn" id="ixFs" type="button" aria-label="${T.fs}">${ic('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>')}</button></div>`;
+const $=id=>document.getElementById(id),S=[...root.querySelectorAll('.ixsc')],B=root.querySelector('.ixb'),Dm=5600;
+S.forEach(()=>B.insertAdjacentHTML('beforeend','<i><b></b></i>'));
+const bs=[...B.children];let cur=0,t=null,paused=false,left=Dm,t0=0,alive=true;
+function show(n){cur=(n+S.length)%S.length;S.forEach((s,i)=>s.classList.toggle('on',i===cur));bs.forEach((b,i)=>{b.classList.remove('on');b.classList.toggle('done',i<cur);void b.offsetWidth});bs[cur].style.setProperty('--d',Dm+'ms');bs[cur].classList.add('on');left=Dm;run()}
+function run(){clearTimeout(t);if(paused)return;t0=Date.now();t=setTimeout(()=>{cur===S.length-1?close():show(cur+1)},left)}
+function toggle(){paused=!paused;root.classList.toggle('paused',paused);if(paused){clearTimeout(t);left-=Date.now()-t0}else run();$('ixPp').innerHTML=ic(paused?'<path d="M8 5l11 7-11 7z"/>':'<path d="M8 5v14M16 5v14"/>')}
+function key(e){if(e.key==='Escape')close();else if(e.key===' '){e.preventDefault();toggle()}else if(e.key==='ArrowLeft')show(cur+(ar?1:-1));else if(e.key==='ArrowRight')show(cur+(ar?-1:1))}
+function close(){if(!alive)return;alive=false;clearTimeout(t);document.removeEventListener('keydown',key);root.classList.add('out');setTimeout(()=>root.remove(),700)}
+$('ixPp').onclick=toggle;$('ixNx').onclick=()=>show(cur+1);$('ixPv').onclick=()=>show(cur-1);
+$('ixSkip').onclick=close;$('ixEnter').onclick=close;
+$('ixFs').onclick=()=>document.fullscreenElement?document.exitFullscreen():(document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen());
+document.addEventListener('keydown',key);
+const c=$('ixfx'),x=c.getContext('2d');let W,H,P=[];
+function rs(){W=c.width=innerWidth;H=c.height=innerHeight}rs();addEventListener('resize',rs);
+const mk=r=>({x:Math.random()*W,y:r?Math.random()*H:H+10,r:Math.random()*1.6+.4,v:Math.random()*.35+.1,s:Math.random()*6.28,a:Math.random()*.5+.15});
+for(let i=0;i<55;i++)P.push(mk(true));
+const col=(getComputedStyle(document.documentElement).getPropertyValue('--ac')||'#D8B26E').trim();
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+(function f(){if(!alive)return;x.clearRect(0,0,W,H);for(const p of P){p.y-=p.v;p.s+=.01;p.x+=Math.sin(p.s)*.25;if(p.y<-10)Object.assign(p,mk(false));x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.globalAlpha=p.a;x.fillStyle=col;x.fill()}x.globalAlpha=1;if(!reduce)requestAnimationFrame(f)})();
+show(0);
+})();
+</script>
+
+<script>
+/* ===== بوابة الأعضاء: 20 كود، كل كود لصفحة عضو، ولوحة تحكم للإدارة ===== */
+(function(){
+const SB_URL='',SB_KEY='';/* ← رابط Supabase والمفتاح العام (anon) لتفعيل الوضع الحقيقي */
+const MEM={"PSF-001": "41d9cdde17141f8ce12cda5443b4e3cb2d6cc4bb2a08a67f1e3f9cf2ed47f737", "PSF-002": "4b3d26326ea6a45ea4c25d7100af76cf96734fe9aab5e4aedae058bd643d8e64", "PSF-003": "315d53844e4e79ce001bc8a0854bb432c19ca47d94ce863963b22f1d7624b9c3", "PSF-004": "072558cf652ec3be860216f15e3f092cac0363d1fe6be2c2abc546d1bc086d59", "PSF-005": "5891cbc0db503ed0ff37a6eac6b16e1559ff9dcfaf9da49099f846bfd7f9aac8", "PSF-006": "ecd6216611ccd1e30388b44787db9c26cea5f9ddb08ceac6232633921fe2d50a", "PSF-007": "1cd5b8dae3df4ef8874c132395bb3c3428ed3cc2226fae2fa77f95d7869b1302", "PSF-008": "e8fa14408b76fdf8dbd1954b2e97baccc9e10061d1957a8e41c485dbfc7cb7bc", "PSF-009": "a4fe332caca02bca39bea69173e17efce3c27d8c32e802a1752dfeaf6f409155", "PSF-010": "8cadf6863a7135a3f477d40190ae65d7cde3a318aa68f78893fe918262adfd52", "PSF-011": "8dace48a4d1422432f532e048d9669b8bc79787cee434d767839a8f48cfba38d", "PSF-012": "10d9980e7f6fc5daec8b8dca937091c560d9a4dc2fc27893baa537eb627c198b", "PSF-013": "7478a86ca26d35c3919b290d822b434f3faa404b4b8cffe25ddfbe9931fbafec", "PSF-014": "a534bfda05c895520529b3ff70f8960e89bdd0b283447747bfb5d20e61916c53", "PSF-015": "3d9c9e7f170182bb28ae92474715c4d83abde6bdf80ffc3ad8a8bfe13bca365a", "PSF-016": "464e67411b0cccb70327fd2cd61d38614ede8d957dba34e2929a58231d375950", "PSF-017": "ecb76304f47e57a9f1e254913f21066339a797a0586ab369df5516a41202c6d2", "PSF-018": "10ce1c6e982aa1849e2ed9d3fa79e2ed33b7660d68536f9ddd72ca91b29fb438", "PSF-019": "46cba0d15ec68ec169c85fa373c96bb1a0b5f35b4361262b65c7f9ed7d09979a", "PSF-020": "d77a549943f2720ddeab91d826705b9c5aff3ffbf2faf5f0827bd7d9f88be5f0"},ADM='9c2b2618c26fc9a3e930be51952ea336fe6973e2cffc33146a55521d7778b8d7';
+const K={hr:'تقرير HR',complaint:'شكوى',presence:'تواجد',note:'ملاحظات'},ST={new:'جديد',reviewed:'تمت المراجعة',rejected:'مرفوض'};
+const E=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const AM={};'ضQصWثEقRفTغYعUهIخOحPشAسSيDبFلGاHتJنKمLئZءXؤCرVىNةM'.replace(/(.)([A-Z])/g,(m,a,b)=>(AM[a]=b,''));Object.assign(AM,{'أ':'H','إ':'Y','آ':'N','َ':'Q','ً':'W','ُ':'E','ٌ':'R','ِ':'A','ٍ':'S','ْ':'X','ـ':'J','؛':'P'});
+/* يقبل الكود حتى لو انكتب بكيبورد عربي */
+const n1=c=>String(c||'').replace(/ل([إأآ])/g,(m,x)=>({'إ':'T','أ':'G','آ':'B'}[x])).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).split('').map(ch=>AM[ch]||ch).join('').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const norm=n1;
+const vars=s=>{s=String(s||'');const p=s.split('لا');if(p.length<2||p.length>5)return[n1(s)];let o=[n1(p[0])];for(let i=1;i<p.length;i++){const q=n1(p[i]);o=o.flatMap(x=>[x+'GH'+q,x+'B'+q])}return o};
+function sha256(m){const b=new TextEncoder().encode(m),l=b.length,w=new Uint32Array(((l+72)>>6)<<4),r=(x,n)=>(x>>>n)|(x<<(32-n));
+ for(let i=0;i<l;i++)w[i>>2]|=b[i]<<(24-8*(i&3));w[l>>2]|=128<<(24-8*(l&3));w[w.length-1]=l*8;
+ const k=[],pr=[];for(let c=2;k.length<64;c++){if(pr.every(p=>c%p)){pr.push(c);k.push((Math.cbrt(c)%1*4294967296)|0)}}
+ let H=[],q=[];for(let i=0;i<8;i++)H.push((Math.sqrt(pr[i])%1*4294967296)|0);
+ for(let o=0;o<w.length;o+=16){const x=new Array(64);for(let i=0;i<16;i++)x[i]=w[o+i];
+  for(let i=16;i<64;i++){const a=x[i-15],c=x[i-2];x[i]=(x[i-16]+(r(a,7)^r(a,18)^(a>>>3))+x[i-7]+(r(c,17)^r(c,19)^(c>>>10)))|0}
+  let [a,b2,c,d,e,f,g,h]=H;
+  for(let i=0;i<64;i++){const t1=(h+(r(e,6)^r(e,11)^r(e,25))+((e&f)^(~e&g))+k[i]+x[i])|0,t2=((r(a,2)^r(a,13)^r(a,22))+((a&b2)^(a&c)^(b2&c)))|0;h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0}
+  H=[a,b2,c,d,e,f,g,h].map((v,i)=>(H[i]+v)|0)}
+ return H.map(v=>(v>>>0).toString(16).padStart(8,'0')).join('')}
+async function H(c){const t=norm(c);try{if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(v=>v.toString(16).padStart(2,'0')).join('')}}catch(_){}return sha256(t)}
+const sb=(SB_URL&&SB_KEY&&window.supabase)?window.supabase.createClient(SB_URL,SB_KEY):null;
+const rpc=async(f,a)=>{const r=await sb.rpc(f,a);if(r.error)throw r.error;return r.data};
+const LK='psf_entries_v1',ld=()=>{try{return JSON.parse(localStorage.getItem(LK))||[]}catch(_){return[]}},sv=a=>localStorage.setItem(LK,JSON.stringify(a));
+const API={
+ async login(c){if(sb)return rpc('member_login',{c:norm(c)});const hs=await Promise.all(vars(c).map(H));if(hs.includes(ADM))return'ADMIN';return Object.keys(MEM).find(i=>hs.includes(MEM[i]))||null},
+ async add(s,k,t,b,x){if(sb)return rpc('add_entry',{c:s.code,k,t,b,x});const a=ld();a.push({id:Date.now(),member_id:s.id,kind:k,title:t,body:b,extra:x,status:'new',review_note:null,created_at:new Date().toISOString()});sv(a)},
+ async mine(s){return sb?rpc('my_entries',{c:s.code}):ld().filter(r=>r.member_id===s.id)},
+ async all(s){return sb?rpc('admin_all',{c:s.code}):ld()},
+ async set(s,i,st,n){if(sb)return rpc('admin_set',{c:s.code,i,s:st,n:n||''});const a=ld(),r=a.find(x=>x.id===i);if(r){r.status=st;r.review_note=n||null}sv(a)}
+};
+const css=document.getElementById('mecss').textContent.replace(/#meBtn/g,'#me2Btn').replace(/#meBox/g,'#me2Box').replace(/#me(?![A-Za-z0-9])/g,'#me2');
+const sty=document.createElement('style');sty.textContent=css+'#me2Btn{inset-inline-end:auto;inset-inline-start:16px}#me2{z-index:9600}#me2 summary{cursor:pointer;margin:10px 0;color:var(--ac)}';document.head.appendChild(sty);const hid=document.createElement('style');hid.textContent='#meBtn,#memBtn,#me2Btn{display:none!important}';document.head.appendChild(hid);
+document.body.insertAdjacentHTML('beforeend','<button id="me2Btn" type="button">🔑 بوابة الأعضاء</button><div id="me2" hidden><div id="me2Box"></div></div>');
+const root=document.getElementById('me2'),box=document.getElementById('me2Box');
+let S=null,tab='hr',rows=[],msg='',fk='',fm='',fs='';
+let NM={};try{NM=JSON.parse(localStorage.getItem('psf_names_v1'))||{}}catch(_){}
+const nm=id=>NM[id]?E(NM[id])+' ('+E(id)+')':E(id);
+const enc=o=>'PSF1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o)))),dec=t=>JSON.parse(decodeURIComponent(escape(atob(t.slice(5)))));
+const day=d=>d?new Date(d).toLocaleString('ar',{dateStyle:'medium',timeStyle:'short'}):'';
+const op=(o,v)=>Object.keys(o).map(k=>`<option value="${k}"${k===v?' selected':''}>${o[k]}</option>`).join('');
+async function load(){try{rows=(S.id==='ADMIN'?await API.all(S):await API.mine(S))||[];rows=rows.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))}catch(e){rows=[];msg='خطأ بالاتصال: '+(e.message||'')}}
+const card=(r,a)=>`<article><header><b>${E(r.title)}</b><span class="st">${ST[r.status]||E(r.status)}</span></header><small>${a?nm(r.member_id)+' | ':''}${K[r.kind]||''} | ${day(r.created_at)}${r.extra?' | '+E(r.extra):''}</small>${r.body?`<p>${E(r.body)}</p>`:''}${r.review_note?`<p class="rv">ملاحظة الإدارة: ${E(r.review_note)}</p>`:''}${a?`<input data-n="${r.id}" maxlength="300" placeholder="ملاحظة للعضو (اختياري)"><div class="r"><button class="pri" data-s="${r.id}|reviewed">تمت المراجعة</button><button data-s="${r.id}|rejected">رفض</button></div>`:`${sb?'':`<button data-cp="${r.id}">نسخ للإرسال</button>`}`}</article>`;
+function draw(){
+ let h=sb||!S?'':(S.id==='ADMIN'?'<div class="demo">استورد تقارير الأعضاء: الصق النص اللي بيوصلك منهم بالخانة تحت.</div>':'<div class="demo">تقريرك بينحفظ على جهازك. بعد الإرسال اضغط «نسخ للإرسال» وابعته للقيادة.</div>');
+ if(!S){box.innerHTML=h+'<div class="mh"><b>بوابة الأعضاء</b><small>نسخة 8</small><span class="sp"></span><button data-x="close">إغلاق</button></div><form id="lg"><label>كودك الخاص</label><input name="c" type="text" dir="ltr" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" required placeholder="XXXX-XXXX-XXXX"><button class="pri">دخول</button></form>'+(msg?`<p class="rv">${E(msg)}</p>`:'');return}
+ const adm=S.id==='ADMIN';
+ h+=`<div class="mh"><b>${adm?'لوحة تحكم التقارير':'صفحة العضو '+E(S.id)}</b><span class="sp"></span><button data-x="out">خروج</button><button data-x="close">إغلاق</button></div>`;
+ if(msg)h+=`<p class="rv">${E(msg)}</p>`;
+ if(adm){
+  const c=k=>rows.filter(r=>r.kind===k).length,ms=[...new Set(rows.map(r=>r.member_id))].sort();
+  h+='<div class="tiles">'+[['الكل',rows.length],['جديد',rows.filter(r=>r.status==='new').length]].concat(Object.keys(K).map(k=>[K[k],c(k)])).map(x=>`<div><b>${x[1]}</b><span>${x[0]}</span></div>`).join('')+'</div>';
+  const hrs=r=>{const m=/المدة: ([\d.]+)/.exec(r.extra||'');return m?+m[1]:0},ids=Object.keys(MEM);
+  h+='<article><b>ملخص الأعضاء</b><div class="tw"><table><tr><th>العضو</th><th>HR</th><th>شكاوى</th><th>ساعات التواجد</th><th>ملاحظات</th><th>آخر نشاط</th></tr>'+ids.map(id=>{const m=rows.filter(r=>r.member_id===id),l=m[0],n=k=>m.filter(r=>r.kind===k).length;return `<tr><td>${nm(id)}</td><td>${n('hr')}</td><td>${n('complaint')}</td><td>${m.filter(r=>r.kind==='presence').reduce((t,r)=>t+hrs(r),0)}</td><td>${n('note')}</td><td>${l?day(l.created_at):'-'}</td></tr>`}).join('')+'</table></div></article>';
+  h+='<details><summary>أسماء الأعضاء (اكتب اسم كل عضو ليظهر بالتقارير)</summary>'+ids.map(id=>`<input data-nm="${id}" maxlength="40" placeholder="${id}" value="${E(NM[id]||'')}">`).join('')+'</details>';
+  if(!sb)h+='<form id="imp"><textarea name="x" rows="3" placeholder="الصق التقارير هنا (كل تقرير بسطر)"></textarea><button class="pri">استيراد</button></form>';
+  h+=`<div class="r"><select id="fk"><option value="">كل الأنواع</option>${op(K,fk)}</select><select id="fm"><option value="">كل الأعضاء</option>${ms.map(m=>`<option value="${E(m)}"${m===fm?' selected':''}>${nm(m)}</option>`).join('')}</select><select id="fs"><option value="">كل الحالات</option>${op(ST,fs)}</select></div>`;
+  const f=rows.filter(r=>(!fk||r.kind===fk)&&(!fm||r.member_id===fm)&&(!fs||r.status===fs));
+  h+=f.length?f.map(r=>card(r,1)).join(''):'<p><small>ما في سجلات.</small></p>';
+ }else{
+  h+=`<div class="tabs">${Object.keys(K).map(k=>`<button data-tab="${k}"${k===tab?' class="on"':''}>${K[k]}</button>`).join('')}</div>`;
+  h+=`<form id="f"><input name="t" required maxlength="120" placeholder="العنوان">${tab==='presence'?'<div class="r"><input type="date" name="d" required><input type="number" name="hrs" min="0.5" max="24" step="0.5" placeholder="عدد الساعات" required></div>':''}<textarea name="b" rows="4" maxlength="4000" placeholder="${tab==='note'?'ملاحظاتك':'التفاصيل'}"></textarea><button class="pri">إرسال ${K[tab]}</button></form>`;
+  const m=rows.filter(r=>r.kind===tab);h+=m.length?m.map(r=>card(r,0)).join(''):'<p><small>ما في سجلات لسه.</small></p>';
+ }
+ box.innerHTML=h}
+box.onclick=async e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.x==='close'){root.hidden=true;return}
+ if(d.x==='out'){S=null;msg='';rows=[];return draw()}
+ if(d.tab){tab=d.tab;msg='';return draw()}
+ if(d.cp){const r=rows.find(x=>String(x.id)===d.cp);if(r){const tx=enc({i:r.id,m:r.member_id,k:r.kind,t:r.title,b:r.body,x:r.extra,d:r.created_at});try{await navigator.clipboard.writeText(tx);msg='تم النسخ ✓ الصقه وابعته للقيادة'}catch(_){prompt('انسخ هالنص وابعته للقيادة',tx)}draw()}return}
+ if(d.s){const p=d.s.split('|'),i=box.querySelector(`[data-n="${p[0]}"]`);try{await API.set(S,+p[0],p[1],i&&i.value.trim());await load()}catch(er){msg=er.message||'صار خطأ'}draw()}};
+box.onsubmit=async e=>{e.preventDefault();const f=e.target,d=Object.fromEntries(new FormData(f));
+ try{
+  if(f.id==='lg'){const id=await API.login(d.c);if(!id){const q=vars(d.c)[0];msg='الكود غير صحيح. الموقع قرأ: '+q+' ('+q.length+' خانة من 12).';return draw()}S={id,code:norm(d.c)};msg='';await load();return draw()}
+  if(f.id==='imp'){let ok=0,dup=0,bad=0;const a=ld();for(const ln of(d.x||'').split(/\s+/).filter(Boolean)){try{if(!ln.startsWith('PSF1:'))throw 0;const o=dec(ln);if(!MEM[o.m]||!K[o.k]||!o.t)throw 0;const u=o.m+'#'+o.i;if(a.some(r=>r.src===u)){dup++;continue}a.push({id:Date.now()+ok,src:u,member_id:o.m,kind:o.k,title:String(o.t).slice(0,120),body:String(o.b||'').slice(0,4000),extra:String(o.x||'').slice(0,100),status:'new',review_note:null,created_at:o.d||new Date().toISOString()});ok++}catch(_){bad++}}sv(a);msg='تم استيراد '+ok+(dup?' | مكرر '+dup:'')+(bad?' | غير صالح '+bad:'');await load();return draw()}
+  await API.add(S,tab,d.t.trim(),(d.b||'').trim(),tab==='presence'?`التاريخ: ${d.d} | المدة: ${d.hrs} ساعة`:'');msg='تم الإرسال ✓';await load();draw()
+ }catch(er){msg=er.message||'صار خطأ';draw()}};
+box.onchange=e=>{const t=e.target;if(t.dataset&&t.dataset.nm){NM[t.dataset.nm]=t.value.trim();try{localStorage.setItem('psf_names_v1',JSON.stringify(NM))}catch(_){}msg='تم حفظ الاسم ✓';return}if(t.id==='fk')fk=t.value;else if(t.id==='fm')fm=t.value;else if(t.id==='fs')fs=t.value;else return;draw()};
+const lk=document.getElementById('lockBtn');if(lk){const b2=document.createElement('button');b2.className='tb wide';b2.textContent='🔑 بوابة الأعضاء';b2.onclick=()=>{root.hidden=false;draw()};lk.after(b2)}
+document.getElementById('me2Btn').onclick=()=>{root.hidden=false;draw()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!root.hidden)root.hidden=true});
+})();
+</script>
+</body>
+</html>
